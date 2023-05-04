@@ -39,20 +39,18 @@ export const SVG = (() => {
         }
     };
 
-    const parsePathToId = (path) => parseInt(path.attr('id').split('_')[1]);
-    const parseEllipseToId = (ellipse) =>
-        parseInt(ellipse.attr('id').split('_')[2]);
-    const parseTextToId = (text) => parseInt(text.attr('id').split('_')[1]);
+    const parseSvgToId = (svg) => {
+        const arr = svg.attr('id').split('_');
+        return parseInt(arr[arr.length - 1]);
+    };
 
     const getPathsById = (ids) =>
-        svgPaths.filter((path) => ids.includes(parsePathToId(path)));
+        svgPaths.filter((path) => ids.includes(parseSvgToId(path)));
 
     return {
         initSvgPaths,
         getSvgPathByXY,
-        parsePathToId,
         getPathsById,
-        parseEllipseToId,
-        parseTextToId,
+        parseSvgToId,
     };
 })();

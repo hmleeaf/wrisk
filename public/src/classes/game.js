@@ -11,23 +11,7 @@ $(() => {
         $(value).css({
             // translate each text background up to center them
             cy: $(value).attr('cy') - 7,
-            // add outline
-            'stroke-width': 3,
         });
-    });
-
-    // zone svg
-    $('path').each((_, value) => {
-        if ($(value).attr('id').includes('zone'))
-            $(value).css({
-                // add outline
-                'stroke-width': 5,
-            });
-        if ($(value).attr('id').includes('sea_route'))
-            $(value).css({
-                // add outline
-                'stroke-width': 3,
-            });
     });
 });
 
@@ -42,19 +26,24 @@ export const Game = (() => {
 
         $('ellipse').each((_, value) => {
             const ellipse = $(value);
-            const id = SVG.parseEllipseToId(ellipse);
+            const id = SVG.parseSvgToId(ellipse);
             const owner = board.getZoneOwner(id);
             ellipse.css({
                 fill:
                     owner === 0
-                        ? colors.player1.secondary
-                        : colors.player2.secondary,
+                        ? colors.player1.background
+                        : colors.player2.background,
+                stroke:
+                    owner === 0
+                        ? colors.player1.outline
+                        : colors.player2.outline,
             });
         });
 
         $('text').each((_, value) => {
             const text = $(value);
-            const id = SVG.parseTextToId(text);
+            if (!text.attr('id').includes('zone')) return;
+            const id = SVG.parseSvgToId(text);
             const troop = board.getZoneTroop(id);
             text.text(troop);
         });
@@ -62,13 +51,10 @@ export const Game = (() => {
         $('path').each((_, value) => {
             const path = $(value);
             if (!path.attr('id').includes('zone')) return;
-            const id = SVG.parsePathToId(path);
+            const id = SVG.parseSvgToId(path);
             const owner = board.getZoneOwner(id);
             path.css({
-                fill:
-                    owner === 0
-                        ? colors.player1.primary
-                        : colors.player2.primary,
+                fill: owner === 0 ? colors.player1.zone : colors.player2.zone,
             });
         });
 
@@ -82,7 +68,7 @@ export const Game = (() => {
 
     const draftZone = (path) => {
         const adjacentPaths = SVG.getPathsById(
-            board.getAdjacentZones(SVG.parsePathToId(path))
+            board.getAdjacentZones(SVG.parseSvgToId(path))
         );
 
         console.log(path, adjacentPaths);

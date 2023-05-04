@@ -1,10 +1,12 @@
 export default {
     player1: {
-        primary: '#e93423',
-        secondary: '#d55049',
+        zone: '#e93423',
+        background: '#d55049',
+        outline: '#802f2e',
     },
     player2: {
-        primary: '#557c47',
-        secondary: '#add773',
+        zone: '#557c47',
+        background: '#add773',
+        outline: '#628146',
     },
 };

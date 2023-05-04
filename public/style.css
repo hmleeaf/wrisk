@@ -1,0 +1,147 @@
+:root {
+    --player1-color-zone: #e93423;
+    --player1-color-background: #d55049;
+    --player1-color-outline: #802f2e;
+
+    --player2-color-zone: #557c47;
+    --player2-color-background: #add773;
+    --player2-color-outline: #628146;
+}
+
+* {
+    font-family: "Cairo", sans-serif;
+    color: #000;
+    box-sizing: border-box;
+}
+
+body {
+    min-width: 600px;
+    min-height: 300px;
+    height: 100vh;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: black;
+}
+
+svg {
+    height: 100vh;
+    width: auto;
+}
+
+text {
+    fill: #fff;
+    font-weight: 800;
+    stroke-width: 5;
+    stroke: #000;
+    paint-order: stroke;
+    text-anchor: middle;
+    font-size: 24px;
+}
+
+g#areas path {
+    stroke-width: 5px;
+    stroke: #000;
+}
+
+g#sea-routes path {
+    stroke-width: 3px;
+    stroke: #000;
+    fill: none;
+}
+
+g#areas, g#text-backgrounds, g#texts {
+    cursor: pointer;
+}
+
+ellipse {
+    stroke-width: 3px;
+    stroke: #000;
+}
+
+#info-panel {
+    position: absolute;
+    bottom: 0px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    width: 36vw;
+    height: 20vh;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 4vw;
+    padding-right: 4vw;
+
+    border-top-right-radius: 2vh;
+    border-top-left-radius: 2vh;
+}
+
+.text-display {
+    width: 8vh;
+    height: 8vh;
+    border-radius: 4vh;
+    border: solid 3px var(--player1-color-outline);
+    font-size: 4vh;
+    background-color: var(--player1-color-background);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.text-display svg {
+    width: 100%;
+    height: inherit;
+}
+
+.text-display text {
+    text-anchor: middle;
+    stroke-width: 5px;
+    stroke: var(--player1-color-outline);
+}
+
+.no-backdrop {
+    background-color: transparent;
+    border: none;
+}
+
+.no-backdrop text {
+    stroke: #000;
+}
+
+#turn-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2vh;
+}
+
+#turn-text-wrapper {
+    width: 16vw;
+    height: 6vh;
+}
+
+#phase-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 1vw;
+}
+
+#phase-text-wrapper {
+    width: 16vw;
+    height: 6vh;
+}
+
+.phase-square {
+    width: 6vw;
+    height: 1vh;
+    background: #fff;
+    border-radius: 0.5vh;
+}
