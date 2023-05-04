@@ -162,6 +162,213 @@ const io = new Server(httpServer);
 // initialize empty online users
 const onlineUsers = {};
 
+let waitingArea = [];
+
+let rooms = [];
+
+const playerLimit = 2;
+
+const maps = [{
+  territories: [
+    {
+      id: 0,
+      neighbours: [1, 6, 13]
+    },
+    {
+      id: 1,
+      neighbours: [0, 2]
+    },
+    {
+      id: 2,
+      neighbours: [1, 3]
+    },
+    {
+      id: 3,
+      neighbours: [2, 4, 5]
+    },
+    {
+      id: 4,
+      neighbours: [3, 18]
+    },
+    {
+      id: 5,
+      neighbours: [3, 10]
+    },
+    {
+      id: 6,
+      neighbours: [0, 8]
+    },
+    {
+      id: 7,
+      neighbours: [8, 9]
+    },
+    {
+      id: 8,
+      neighbours: [6, 7, 9, 13]
+    },
+    {
+      id: 9,
+      neighbours: [7, 8, 10, 13, 15]
+    },
+    {
+      id: 10,
+      neighbours: [5, 9, 11]
+    },
+    {
+      id: 11,
+      neighbours: [10, 12, 15]
+    },
+    {
+      id: 12,
+      neighbours: [11, 17]
+    },
+    {
+      id: 13,
+      neighbours: [0, 8, 9, 14]
+    },
+    {
+      id: 14,
+      neighbours: [13, 15, 16]
+    },
+    {
+      id: 15,
+      neighbours: [9, 11, 14, 16]
+    },
+    {
+      id: 16,
+      neighbours: [14, 15, 17, 18]
+    },
+    {
+      id: 17,
+      neighbours: [12, 16, 18]
+    },
+    {
+      id: 18,
+      neighbours: [4, 16, 17]
+    }
+  ],
+  continents: [
+    {
+      name: 'asia', territories: [13, 14, 15, 16]
+    },
+    {
+      name: 'australia',
+      territories: [17, 18]
+    },
+    {
+      name: 'europe',
+      territories: [7, 8, 9]
+    },
+    {
+      name: 'africa',
+      territories: [10, 11, 12]
+    },
+    {
+      name: 'north america',
+      territories: [0, 1, 2]
+    },
+    {
+      name: 'south america',
+      territories: [3, 4, 5]
+    }
+  ]
+
+
+}]
+
+const generateRandomRoomCode = () => {
+  let roomCode = '';
+  const codeLength = 10;
+  let uniqueCheck = false;
+
+  let duplicateFound;
+  while (!uniqueCheck) {
+    for (let i = 0; i < codeLength; i++) {
+      const randomAscii = Math.floor(Math.random() * 26) + 65;
+      roomCode += String.fromCharCode(randomAscii);
+    }
+    duplicateFound = false;
+    for (let i = 0; i < rooms.length; i++) {
+      if (rooms[i].roomCode === roomCode) {
+        duplicateFound = true;
+        break;
+      }
+    }
+    if (!duplicateFound)
+      uniqueCheck = true;
+  }
+  return roomCode;
+}
+
+const getRoomIndexByRoomCode = roomCode => {
+  let roomIndex = -1;
+  for (let i = 0; i < rooms.length; i++){
+    if (rooms[i].roomCode === roomCode){
+      return i;
+    }
+  }
+  return roomIndex;
+}
+
+const initializeBoard = map => {
+  let n = playerLimit;
+  let t = Math.floor((map.territories.length * 1.8)/ n );
+  const shuffledTerritories = shuffleArray([...map.territories]);
+  const userTerritories = Array.from({ length: n }, () => []);
+
+  for (let i = 0; i < shuffledTerritories.length; i++) {
+    const userIndex = i % n;
+    userTerritories[userIndex].push(shuffledTerritories[i].id);
+  }
+
+  const updatedTerritories = map.territories.map(territory => {
+    const owner = userTerritories.findIndex(userTerritoryIds =>
+        userTerritoryIds.includes(territory.id)
+    );
+    return { ...territory, owner };
+  });
+
+  const territoriesWithTroops = distributeTroops(updatedTerritories, userTerritories, t);
+
+  return { ...map, territories: territoriesWithTroops };
+}
+
+function distributeTroops(territories, userTerritories, t) {
+  const territoriesWithTroops = territories.map(territory => ({ ...territory, troops: 1 }));
+
+  for (let i = 0; i < userTerritories.length; i++) {
+    let remainingTroops = t - userTerritories[i].length;
+
+    while (remainingTroops > 0) {
+      const randomTerritoryIndex = Math.floor(Math.random() * userTerritories[i].length);
+      const territoryId = userTerritories[i][randomTerritoryIndex];
+      const territoryIndex = territoriesWithTroops.findIndex(territory => territory.id === territoryId);
+      territoriesWithTroops[territoryIndex].troops += 1;
+      remainingTroops -= 1;
+    }
+  }
+  return territoriesWithTroops;
+}
+
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+function removeKeyFromArray(arr, key) {
+  return arr.map(obj => {
+    const newObj = { ...obj };
+    delete newObj[key];
+    return newObj;
+  });
+}
+
+//test
+console.log(initializeBoard(maps[0]))
+
 // use session
 io.use((socket, next) => {
   chatSession(socket.request, {}, next);
@@ -187,23 +394,38 @@ io.on('connection', (socket) => {
     socket.emit('users', JSON.stringify(onlineUsers));
   });
 
-  socket.on('get messages', () => {
-    const chatroom = JSON.parse(fs.readFileSync('data/chatroom.json'));
-    socket.emit('messages', JSON.stringify(chatroom));
-  });
-
-  socket.on('post message', (content) => {
-    const message = { user, datetime: new Date(), content };
-    const chatroom = JSON.parse(fs.readFileSync('data/chatroom.json'));
-    chatroom.push(message);
-    fs.writeFileSync('data/chatroom.json', JSON.stringify(chatroom, null, ' '));
-
-    io.emit('add message', JSON.stringify(message));
-  });
-
-  socket.on('start typing', () => {
-    io.emit('user typing', JSON.stringify(user));
-  });
+  // 1. User send 'join-waiting-area-request' to join the waiting area
+  // 2. If the waiting area have sufficient players, it will create a room signal the players that are being added with 'game-start-notification'
+  // 3. If the waiting room does not have sufficient players, it will signal the requested socket with join-waiting-area-request'
+  socket.on('join-waiting-area-request', () => {
+    waitingArea.push({user, socketID: socket.id});
+    console.log(`User ${user.name} has joined the waiting room.`)
+    if (waitingArea.length >= playerLimit) {
+      let players = waitingArea.splice(0, playerLimit).map(player => {return {...player, cards: []}});
+      const roomCode = generateRandomRoomCode();
+      for (const player of players) {
+        io.sockets.sockets.get(player.socketID).join(roomCode);
+      }
+      rooms.push({
+        players,
+        roomCode,
+        currentPlayerIndex: 0,
+        board: initializeBoard(maps[0]),
+        state: 'draft'
+      })
+      const room = rooms[getRoomIndexByRoomCode(roomCode)];
+      socket.to(roomCode).emit('game-start-notification', {
+        players: removeKeyFromArray(room.players, 'cards'),
+        roomCode: room.roomCode,
+        currentPlayerIndex: room.currentPlayerIndex,
+        board: room.board,
+        state: room.state
+      })
+      console.log(`Room ${room.roomCode} has started a game.`)
+    } else {
+      socket.emit('join-waiting-area-request', {success: true, message: 'Please wait for other players.'})
+    }
+  })
 });
 
 // Use a web server to listen at port 8000
