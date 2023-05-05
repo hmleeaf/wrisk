@@ -465,13 +465,13 @@ io.use((socket, next) => {
 
 io.on('connection', (socket) => {
   // add user to online
-  // const user = socket.request.session.user;
-  // if (user) {
-  //   onlineUsers[user.username] = { avatar: user.avatar, name: user.name };
-  //   io.emit('add user', JSON.stringify(user));
-  // }
+  const user = socket.request.session.user;
+  if (user) {
+    onlineUsers[user.username] = { avatar: user.avatar, name: user.name };
+    io.emit('add user', JSON.stringify(user));
+  }
 
-  const user = 'test user'
+  // const user = 'test user'
   console.log(socket.id, 'has connectd.')
 
   // delete user on disconnect
@@ -827,16 +827,6 @@ io.on('connection', (socket) => {
     rooms[roomIndex].board.territories[defenderTerritoryIndex].troops = req.defenderTroops;
     rooms[roomIndex].board.territories[attackerTerritoryIndex].owner = room.currentPlayerIndex;
     rooms[roomIndex].board.territories[defenderTerritoryIndex].owner = room.currentPlayerIndex;
-
-    if(areAllLandsOwnedByOnePlayer(room.board)) {
-      io.to(room.roomCode).emit('end-game-notification', {
-        players: removeKeyFromArray(room.players, 'cards'),
-        roomCode: room.roomCode,
-        currentPlayerIndex: room.currentPlayerIndex,
-        board: room.board,
-        state: room.state,
-      })
-    }
 
     if(areAllLandsOwnedByOnePlayer(room.board)) {
       rooms[roomIndex].state = 'end';
