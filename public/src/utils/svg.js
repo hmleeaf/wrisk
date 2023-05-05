@@ -12,13 +12,21 @@ export const SVG = (() => {
         }
     };
 
-    const getSvgPathByXY = (x, y) => {
+    const getSvgPathByEvent = (e) => {
+        const { clientX: x, clientY: y } = e;
+        const svg = $('#play_area').get()[0];
         // create points for different browser versions
         // https://developer.mozilla.org/en-US/docs/Web/API/SVGGeometryElement/isPointInFill
         const domPoint = new DOMPoint(x, y);
-        const svgPoint = $('#play_area').get()[0].createSVGPoint();
+        const domPointLocal = domPoint.matrixTransform(
+            svg.getScreenCTM().inverse()
+        );
+        const svgPoint = svg.createSVGPoint();
         svgPoint.x = x;
         svgPoint.y = y;
+        const svgPointLocal = svgPoint.matrixTransform(
+            svg.getScreenCTM().inverse()
+        );
 
         for (let i = 0; i < svgPaths.length; ++i) {
             const path = svgPaths[i];
@@ -27,9 +35,9 @@ export const SVG = (() => {
             const pathDom = path.get()[0];
             let pointInPath;
             try {
-                pointInPath = pathDom.isPointInFill(domPoint);
+                pointInPath = pathDom.isPointInFill(domPointLocal);
             } catch (e) {
-                pointInPath = pathDom.isPointInFill(svgPoint);
+                pointInPath = pathDom.isPointInFill(svgPointLocal);
             }
 
             // do things with path
@@ -44,13 +52,19 @@ export const SVG = (() => {
         return parseInt(arr[arr.length - 1]);
     };
 
-    const getPathsById = (ids) =>
+    const getPathsByIds = (ids) =>
         svgPaths.filter((path) => ids.includes(parseSvgToId(path)));
+
+    const setDebugPointTo = (x, y) => $('#debug-point').css({ cx: x, cy: y });
+
+    const getPaths = () => svgPaths;
 
     return {
         initSvgPaths,
-        getSvgPathByXY,
-        getPathsById,
+        getSvgPathByEvent,
+        getPathsByIds,
         parseSvgToId,
+        setDebugPointTo,
+        getPaths,
     };
 })();

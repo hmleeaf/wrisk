@@ -1,78 +1,83 @@
 import colors from '../constants/colors.js';
-import { STATES } from '../constants/states.js';
-import { createStateMachine } from '../utils/stateMachine.js';
+import { GameStateMachine } from '../utils/stateMachine.js';
 import { SVG } from '../utils/svg.js';
+import { UI } from './ui.js';
 import { Board } from './board.js';
 
-// set up default styles for svg components
-$(() => {
-    // text background
-    $('ellipse').each((_, value) => {
-        $(value).css({
-            // translate each text background up to center them
-            cy: $(value).attr('cy') - 7,
-        });
-    });
-});
-
 export const Game = (() => {
-    const gameStateMachine = createStateMachine(STATES);
-    const board = Board();
+    let originalZoneTroops;
+    let originalNewTroops = 19; // TODO: remove when connect to socket
+    let draftingZoneId;
 
-    $(document).ready(() => {
-        $('#play_area').on('click', (e) => {
-            gameStateMachine.data.zoneOnClick(e);
-        });
+    let editingZoneTroops;
+    let editingNewTroops;
 
-        $('ellipse').each((_, value) => {
-            const ellipse = $(value);
-            const id = SVG.parseSvgToId(ellipse);
-            const owner = board.getZoneOwner(id);
-            ellipse.css({
-                fill:
-                    owner === 0
-                        ? colors.player1.background
-                        : colors.player2.background,
-                stroke:
-                    owner === 0
-                        ? colors.player1.outline
-                        : colors.player2.outline,
-            });
-        });
+    const beginDraft = (zone) => {
+        UI.highlightBoardZones(zone);
+        UI.showTroopSelector(originalNewTroops);
+        UI.hideInfoPanel();
 
-        $('text').each((_, value) => {
-            const text = $(value);
-            if (!text.attr('id').includes('zone')) return;
-            const id = SVG.parseSvgToId(text);
-            const troop = board.getZoneTroop(id);
-            text.text(troop);
-        });
-
-        $('path').each((_, value) => {
-            const path = $(value);
-            if (!path.attr('id').includes('zone')) return;
-            const id = SVG.parseSvgToId(path);
-            const owner = board.getZoneOwner(id);
-            path.css({
-                fill: owner === 0 ? colors.player1.zone : colors.player2.zone,
-            });
-        });
-
-        $(document).on('keydown', (e) => {
-            if (e.key === 'Enter') {
-                console.log('test');
-                gameStateMachine.transition('next');
-            }
-        });
-    });
-
-    const draftZone = (path) => {
-        const adjacentPaths = SVG.getPathsById(
-            board.getAdjacentZones(SVG.parseSvgToId(path))
-        );
-
-        console.log(path, adjacentPaths);
+        originalZoneTroops = UI.getTroopByZone(zone);
+        editingZoneTroops = UI.getTroopByZone(zone);
+        editingNewTroops = originalNewTroops;
+        draftingZoneId = SVG.parseSvgToId(zone);
     };
 
-    return { draftZone };
+    const cancelDraft = () => {
+        UI.unhighlightBoardZones();
+        UI.hideTroopSelector();
+        UI.showInfoPanel();
+
+        Board.setZoneTroop(draftingZoneId, originalZoneTroops);
+        UI.updateBoardText();
+    };
+
+    const commitDraft = () => {
+        UI.unhighlightBoardZones();
+        UI.hideTroopSelector();
+        UI.showInfoPanel();
+        UI.updateInfoPanel(undefined, undefined, editingNewTroops);
+
+        originalNewTroops = editingNewTroops;
+
+        GameStateMachine.transition('next');
+    };
+
+    const tryIncreaseDraft = () => {
+        if (editingNewTroops - 1 >= 0) {
+            editingNewTroops--;
+            editingZoneTroops++;
+            Board.increaseZoneTroop(draftingZoneId);
+
+            return editingNewTroops;
+        } else {
+            return false;
+        }
+    };
+
+    const tryDecreaseDraft = () => {
+        if (
+            editingNewTroops + 1 <= originalNewTroops &&
+            editingZoneTroops - 1 >= originalZoneTroops
+        ) {
+            editingNewTroops++;
+            editingZoneTroops--;
+            Board.decreaseZoneTroop(draftingZoneId);
+
+            return editingNewTroops;
+        } else {
+            return false;
+        }
+    };
+
+    const getDeployableTroops = () => editingNewTroops;
+
+    return {
+        beginDraft,
+        cancelDraft,
+        commitDraft,
+        tryIncreaseDraft,
+        tryDecreaseDraft,
+        getDeployableTroops,
+    };
 })();

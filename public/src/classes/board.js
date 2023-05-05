@@ -94,7 +94,7 @@ const dummyInitBoard = {
     },
 };
 
-export const Board = () => {
+export const Board = (() => {
     const zones = Object.fromEntries(
         Object.keys(zonesGraph).map((key) => [
             key,
@@ -110,5 +110,16 @@ export const Board = () => {
     const getZoneOwner = (zoneId) => zones[zoneId].owner;
     const getZoneTroop = (zoneId) => zones[zoneId].troop;
 
-    return { getAdjacentZones, getZoneOwner, getZoneTroop };
-};
+    const decreaseZoneTroop = (zoneId) => zones[zoneId].troop--;
+    const increaseZoneTroop = (zoneId) => zones[zoneId].troop++;
+    const setZoneTroop = (zoneId, troops) => (zones[zoneId].troop = troops);
+
+    return {
+        getAdjacentZones,
+        getZoneOwner,
+        getZoneTroop,
+        decreaseZoneTroop,
+        increaseZoneTroop,
+        setZoneTroop,
+    };
+})();

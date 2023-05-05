@@ -4,6 +4,7 @@
     <title>Wrisk</title>
     <script src="https://code.jquery.com/jquery-3.6.1.min.js"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link href="https://fonts.googleapis.com/icon?family=Cairo" rel="stylesheet">
     <link href="style.css" rel="stylesheet">
 </head>
@@ -11,6 +12,8 @@
     <svg id="play_area" viewBox="0 0 1920 1080">
         <!-- backdrop -->
         <rect id="svg_49" height="1080" width="1920" y="0" x="0" fill="#aad4ff"/>
+
+        <circle id="debug-point" cx="0" cy="0" r="5"></circle>
         
         <g id="areas">
         <!-- North America -->
@@ -107,6 +110,7 @@
             <text id="zone_text_17" y="823" x="1433">17</text>
             <text id="zone_text_18" y="793" x="1557">18</text>
         </g>
+
         <g id="sea-routes">
             <path stroke-dasharray="5,5" id="sea_route_16_18" d="m1583.2,649.6c0,0 57.6,28.8 28.8,109.6" />
             <path stroke-dasharray="5,5" id="sea_route_12_17" d="m982.4,876c73.6,96.8 324.8,100.8 404.8,16.8" />
@@ -125,16 +129,14 @@
             <path stroke-dasharray="5,5" id="sea_route_4_18" d="m396.66667,828.33333c-253.33333,73.33333 -476.66667,113.33333 -585,10" />
             <path stroke-dasharray="5,5" id="sea_route_18_4" d="m1625,850c0,0 535,175 675,35" />
         </g>
-        
-        
     </svg>
 
     <div id="info-panel">
         <div id="turn-wrapper">
-            <div id="turn-text-wrapper" class="text-display">
+            <div id="phase-text-wrapper" class="text-display no-backdrop">
                 <svg viewBox="0 0 50 50">
-                    <text id="turn-text" x="25" y="32">
-                        Your Turn
+                    <text id="phase-text" x="25" y="32">
+                        Draft Phase
                     </text>
                 </svg>
             </div>
@@ -143,13 +145,13 @@
                 <div id="phase-square-attack" class="phase-square"></div>
                 <div id="phase-square-fortify" class="phase-square"></div>
             </div>
-            <div id="phase-text-wrapper" class="text-display no-backdrop">
-                <svg viewBox="0 0 50 50">
-                    <text id="turn-text" x="25" y="32">
-                        Draft Phase
+            <button id="next-phase-button" class="troop-button">
+                <svg viewBox="0 0 200 50">
+                    <text id="next-phase-button-text" x="100" y="32">
+                        Next Phase
                     </text>
                 </svg>
-            </div>
+            </button>
         </div>
         <div id="deployable-troops" class="text-display">
             <svg viewBox="0 0 50 50">
@@ -158,6 +160,85 @@
                 </text>
             </svg>
         </div>
+    </div>
+
+    <div id="popup-troops-selector">
+        <button id="troops-cancel-button" class="troop-button">
+            <span class="material-symbols-outlined">
+                close
+            </span>
+        </button>
+        <button id="troops-decrease-button" class="troop-button small">
+            <span class="material-symbols-outlined">
+                remove
+            </span>
+        </button>
+        <div id="troops-text-wrapper" value=0>
+            <svg viewBox="0 0 50 50">
+                <text id="troops-text" x="25" y="32" class="svg-text">
+                    0
+                </text>
+            </svg>
+        </div>
+        <button id="troops-increase-button" class="troop-button small">
+            <span class="material-symbols-outlined">
+                add
+            </span>
+        </button>
+        <button id="troops-confirm-button" class="troop-button">
+            <span class="material-symbols-outlined">
+                done
+            </span>
+        </button>
+    </div>
+
+    <div id="notification">
+        
+    </div>
+
+    <div id="battle-screen">
+        <div id="self-troops-wrapper">
+            <div id="self-troops-title-wrapper">
+                <svg viewBox="0 0 200 50">
+                    <text id="self-troops-title" x="100" y="32" class="svg-text">
+                        Your troops
+                    </text>
+                </svg>
+            </div>
+            <div id="self-troops-text-wrapper" class="text-display">
+                <svg viewBox="0 0 50 50">
+                    <text id="self-troops-text" x="25" y="32" class="svg-text">
+                        5
+                    </text>
+                </svg>
+            </div>
+        </div>
+        <div id="enemy-troops-wrapper">
+            <div id="enemy-troops-title-wrapper">
+                <svg viewBox="0 0 200 50">
+                    <text id="enemy-troops-title" x="100" y="32" class="svg-text">
+                        Enemy troops
+                    </text>
+                </svg>
+            </div>
+            <div id="enemy-troops-text-wrapper" class="text-display enemy">
+                <svg viewBox="0 0 50 50">
+                    <text id="enemy-troops-text" x="25" y="32" class="svg-text">
+                        2
+                    </text>
+                </svg>
+            </div>
+        </div>
+        <div id="battle-buttons-wrapper">
+            <button id="battle-button">
+                Battle
+            </button>
+            <div id="battle-input-wrapper">
+                <input id="skip-checkbox" type="checkbox" name="skip" name="skip-checkbox" value=1>
+                <label for="skip-checkbox">Commit all troops and skip?</label>
+            </div>
+        </div>
+        <button id="close-battle-button">Close</button>
     </div>
 
     <script src="src/classes/game.js" type="module"></script>
