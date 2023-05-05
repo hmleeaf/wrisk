@@ -54,6 +54,8 @@ export const SVG = (() => {
 
     const getPathsByIds = (ids) =>
         svgPaths.filter((path) => ids.includes(parseSvgToId(path)));
+    const getPathById = (id) =>
+        svgPaths.find((path) => parseSvgToId(path) === id);
 
     const setDebugPointTo = (x, y) => $('#debug-point').css({ cx: x, cy: y });
 
@@ -63,6 +65,7 @@ export const SVG = (() => {
         initSvgPaths,
         getSvgPathByEvent,
         getPathsByIds,
+        getPathById,
         parseSvgToId,
         setDebugPointTo,
         getPaths,

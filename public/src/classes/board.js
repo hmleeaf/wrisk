@@ -106,7 +106,11 @@ export const Board = (() => {
         ])
     );
 
-    const getAdjacentZones = (zoneId) => zones[zoneId].adjacentZoneIds;
+    const getAdjacentEnemyZones = (zoneId) => {
+        return zones[zoneId].adjacentZoneIds.filter(
+            (id) => zones[id].owner !== zones[zoneId].owner
+        );
+    };
     const getZoneOwner = (zoneId) => zones[zoneId].owner;
     const getZoneTroop = (zoneId) => zones[zoneId].troop;
 
@@ -115,7 +119,7 @@ export const Board = (() => {
     const setZoneTroop = (zoneId, troops) => (zones[zoneId].troop = troops);
 
     return {
-        getAdjacentZones,
+        getAdjacentEnemyZones,
         getZoneOwner,
         getZoneTroop,
         decreaseZoneTroop,

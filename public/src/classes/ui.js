@@ -41,6 +41,15 @@ export const UI = (() => {
     $('#troops-confirm-button').on('click', () => {
         Game.commitDraft();
     });
+    $('#next-phase-button').on('click', () => {
+        GameStateMachine.transition('next');
+    });
+    $('#close-battle-button').on('click', () => {
+        Game.cancelAttackBattle();
+    });
+    $('#battle-button').on('click', () => {
+        Game.battle();
+    });
 
     $(() => {
         updateBoardText();
@@ -169,7 +178,6 @@ export const UI = (() => {
         }
     };
 
-    const getTroopByZoneId = (id) => parseInt($('#zone_text_' + id).text());
     const getTroopByZone = (zone) =>
         parseInt($('#zone_text_' + SVG.parseSvgToId(zone)).text());
 
@@ -200,6 +208,74 @@ export const UI = (() => {
         $('#notification').text('');
     };
 
+    const updateBattleScreenTroops = (attackerZoneId, defenderZoneId) => {
+        const attackerTroops = Board.getZoneTroop(attackerZoneId);
+        const defenderTroops = Board.getZoneTroop(defenderZoneId);
+        $('#self-troops-text').text(attackerTroops);
+        $('#enemy-troops-text').text(defenderTroops);
+    };
+
+    const showBattleScreen = (attackerZoneId, defenderZoneId) => {
+        $('#battle-screen').fadeIn();
+        updateBattleScreenTroops(attackerZoneId, defenderZoneId);
+        resetRolls(attackerZoneId, defenderZoneId);
+    };
+
+    const hideBattleScreen = () => {
+        $('#battle-screen').fadeOut();
+    };
+
+    const updateRolls = (attackRolls, defendRolls) => {
+        $('#self-dice-1').show();
+        $('#self-dice-2').show();
+        $('#self-dice-3').show();
+        $('#enemy-dice-1').show();
+        $('#enemy-dice-2').show();
+        for (let i = 0; i < 3; ++i) {
+            if (attackRolls[i]) $('#self-dice-' + (i + 1)).text(attackRolls[i]);
+            else $('#self-dice-' + (i + 1)).hide();
+        }
+        for (let i = 0; i < 2; ++i) {
+            if (defendRolls[i])
+                $('#enemy-dice-' + (i + 1)).text(defendRolls[i]);
+            else $('#enemy-dice-' + (i + 1)).hide();
+        }
+    };
+
+    const resetRolls = (attackerZoneId, defenderZoneId) => {
+        const attackerTroops = Board.getZoneTroop(attackerZoneId);
+        const defenderTroops = Board.getZoneTroop(defenderZoneId);
+        for (let i = 0; i < 3; ++i) {
+            if (i < attackerTroops) {
+                $('#self-dice-' + (i + 1)).show();
+                $('#self-dice-' + (i + 1)).text('?');
+                $('#self-dice-' + (i + 1)).css({ color: 'white' });
+            } else $('#self-dice-' + (i + 1)).hide();
+        }
+        for (let i = 0; i < 2; ++i) {
+            if (i < defenderTroops) {
+                $('#enemy-dice-' + (i + 1)).show();
+                $('#enemy-dice-' + (i + 1)).text('?');
+                $('#enemy-dice-' + (i + 1)).css({ color: 'white' });
+            } else $('#enemy-dice-' + (i + 1)).hide();
+        }
+    };
+
+    const updateRollResults = (rollResults) => {
+        $('#self-dice-1').css({ color: 'white' });
+        $('#self-dice-2').css({ color: 'white' });
+        $('#self-dice-3').css({ color: 'white' });
+        $('#enemy-dice-1').css({ color: 'white' });
+        $('#enemy-dice-2').css({ color: 'white' });
+        rollResults.forEach((result, idx) => {
+            if (result) {
+                $('#enemy-dice-' + (idx + 1)).css({ color: 'red' });
+            } else {
+                $('#self-dice-' + (idx + 1)).css({ color: 'red' });
+            }
+        });
+    };
+
     return {
         updateInfoPanel,
         highlightBoardZones,
@@ -215,5 +291,11 @@ export const UI = (() => {
         updateBoardZones,
         showNotification,
         hideNotification,
+        showBattleScreen,
+        hideBattleScreen,
+        updateRolls,
+        updateRollResults,
+        updateBattleScreenTroops,
+        resetRolls,
     };
 })();

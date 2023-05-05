@@ -66,6 +66,14 @@ const STATES = {
                 target: 'SelfDraftSelected',
                 action: () => {
                     console.log(
+                        'transition action for "select" in "SelfDraft" state'
+                    );
+                },
+            },
+            next: {
+                target: 'SelfAttack',
+                action: () => {
+                    console.log(
                         'transition action for "next" in "SelfDraft" state'
                     );
                 },
@@ -129,9 +137,101 @@ const STATES = {
         actions: {
             onEnter: () => {
                 console.log('SelfAttack: onEnter');
+                UI.updateInfoPanel(true, PHASES.ATTACK);
+                UI.showNotification(
+                    'Select a territory to begin your attack from'
+                );
             },
             onExit: () => {
                 console.log('SelfAttack: onExit');
+                UI.hideNotification();
+            },
+        },
+        data: {
+            zoneOnClick: (e) => {
+                const path = SVG.getSvgPathByEvent(e);
+                if (path) GameStateMachine.transition('select', path);
+            },
+        },
+        transitions: {
+            next: {
+                target: 'SelfDraft',
+                action: () => {
+                    console.log(
+                        'transition action for "next" in "SelfAttack" state'
+                    );
+                },
+            },
+            select: {
+                target: 'SelfAttackSelected',
+                action: () => {
+                    console.log(
+                        'transition action for "select" in "SelfAttack" state'
+                    );
+                },
+            },
+        },
+    },
+
+    SelfAttackSelected: {
+        actions: {
+            onEnter: (path) => {
+                console.log('SelfAttackSelected: onEnter');
+                UI.showNotification('Select an adjacent territory to attack');
+                Game.beginAttack(path);
+            },
+            onExit: () => {
+                console.log('SelfAttackSelected: onExit');
+                UI.hideNotification();
+            },
+        },
+        data: {
+            zoneOnClick: (e) => {
+                const path = SVG.getSvgPathByEvent(e);
+                if (path && Game.checkZoneAttackable(path))
+                    GameStateMachine.transition('select', path);
+                else if (path) GameStateMachine.transition('change', path);
+                else GameStateMachine.transition('back');
+            },
+        },
+        transitions: {
+            back: {
+                target: 'SelfAttack',
+                action: () => {
+                    console.log(
+                        'transition action for "back" in "SelfAttackSelected" state'
+                    );
+                    Game.cancelAttack();
+                },
+            },
+            select: {
+                target: 'SelfAttackBattle',
+                action: (path) => {
+                    console.log(
+                        'transition action for "select" in "SelfAttackSelected" state'
+                    );
+                    Game.beginAttackBattle(path);
+                },
+            },
+            change: {
+                target: 'SelfAttackSelected',
+                action: () => {
+                    console.log(
+                        'transition action for "change" in "SelfAttackSelected" state'
+                    );
+                    Game.cancelAttack();
+                },
+            },
+        },
+    },
+
+    SelfAttackBattle: {
+        actions: {
+            onEnter: () => {
+                console.log('SelfAttackBattle: onEnter');
+            },
+            onExit: () => {
+                console.log('SelfAttackBattle: onExit');
             },
         },
         data: {
@@ -142,11 +242,54 @@ const STATES = {
             },
         },
         transitions: {
-            next: {
-                target: 'SelfDraft',
+            back: {
+                target: 'SelfAttackSelected',
                 action: () => {
                     console.log(
-                        'transition action for "next" in "SelfAttack" state'
+                        'transition action for "back" in "SelfAttackBattle" state'
+                    );
+                },
+            },
+            lose: {
+                target: 'SelfAttack',
+                action: () => {
+                    console.log(
+                        'transition action for "finish" in "SelfAttackBattle" state'
+                    );
+                    Game.finishAttack();
+                },
+            },
+            win: {
+                target: 'SelfAttackDeploy',
+                action: () => {
+                    console.log(
+                        'transition action for "finish" in "SelfAttackBattle" state'
+                    );
+                    Game.finishAttack();
+                },
+            },
+        },
+    },
+
+    SelfAttackDeploy: {
+        actions: {
+            onEnter: () => {
+                console.log('SelfAttackDeploy: onEnter');
+                Game.beginAttackDeploy();
+            },
+            onExit: () => {
+                console.log('SelfAttackDeploy: onExit');
+            },
+        },
+        data: {
+            zoneOnClick: (e) => {},
+        },
+        transitions: {
+            next: {
+                target: 'SelfAttack',
+                action: () => {
+                    console.log(
+                        'transition action for "next" in "SelfAttackDeploy" state'
                     );
                 },
             },
