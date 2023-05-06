@@ -10,6 +10,12 @@
     "nodemon": "^2.0.22"
   },
   "scripts": {
-    "dev": "nodemon --ignore data/ app.js"
+    "dev": "nodemon app.js"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "**/data/**"
+    ],
+    "ext": "js, mjs, json, ts, html, svg"
   }
 }
