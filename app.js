@@ -364,31 +364,31 @@ function calculateDraftTroops(board, playerId) {
 }
 
 function riskAttack(attackerTroops, defenderTroops) {
-  function rollDice(numDice) {
-    const rolls = [];
-    for (let i = 0; i < numDice; i++) {
-      rolls.push(Math.floor(Math.random() * 6) + 1);
+    function rollDice(numDice) {
+        const rolls = [];
+        for (let i = 0; i < numDice; i++) {
+            rolls.push(Math.floor(Math.random() * 6) + 1);
+        }
+        return rolls.sort((a, b) => b - a);
     }
-    return rolls.sort((a, b) => b - a);
-  }
 
-  while (attackerTroops > 1 && defenderTroops > 0) {
+
     const attackerDice = rollDice(Math.min(attackerTroops - 1, 3));
     const defenderDice = rollDice(Math.min(defenderTroops, 2));
 
     for (let i = 0; i < Math.min(attackerDice.length, defenderDice.length); i++) {
-      if (attackerDice[i] > defenderDice[i]) {
-        defenderTroops--;
-      } else {
-        attackerTroops--;
-      }
+        if (attackerDice[i] > defenderDice[i]) {
+            defenderTroops--;
+        } else {
+            attackerTroops--;
+        }
     }
-  }
 
-  return {
-    attackerTroops,
-    defenderTroops,
-  };
+
+    return {
+        attackerTroops,
+        defenderTroops,
+    };
 }
 
 function isConnected(board, territoryId1, territoryId2, playerId) {
