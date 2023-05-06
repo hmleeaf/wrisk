@@ -1,4 +1,4 @@
-export const Registration = (function () {
+const Registration = (function () {
     // This function sends a register request to the server
     // * `username`  - The username for the sign-in
     // * `avatar`    - The avatar of the user

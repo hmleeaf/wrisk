@@ -1,19 +1,3 @@
-import colors from '../constants/colors.js';
-import { DICE_SVG_STRING } from '../constants/dice.js';
-import {
-    PHASES,
-    PHASE_MAP_NAME,
-    PHASE_MAP_SQUARE_ID,
-} from '../constants/phases.js';
-import { GameStateMachine } from '../utils/stateMachine.js';
-import { SVG } from '../utils/svg.js';
-import { Authentication } from './authentication.js';
-import { Avatar } from './avatar.js';
-import { Board } from './board.js';
-import { Game } from './game.js';
-import { Registration } from './registration.js';
-import { Socket } from './socket.js';
-
 const SignInForm = (function () {
     // This function initializes the UI
     const initialize = function () {
@@ -99,7 +83,7 @@ const SignInForm = (function () {
     return { initialize, show, hide };
 })();
 
-export const UI = (() => {
+const UI = (() => {
     // set up default behaviors for HTML elements
     $('#popup-troops-selector').hide();
     $('#notification').hide();
@@ -155,12 +139,12 @@ export const UI = (() => {
             ellipse.css({
                 fill:
                     owner === 0
-                        ? colors.player1.background
-                        : colors.player2.background,
+                        ? COLORS.player1.background
+                        : COLORS.player2.background,
                 stroke:
                     owner === 0
-                        ? colors.player1.outline
-                        : colors.player2.outline,
+                        ? COLORS.player1.outline
+                        : COLORS.player2.outline,
             });
         });
     };
@@ -182,7 +166,7 @@ export const UI = (() => {
             const id = SVG.parseSvgToId(path);
             const owner = Board.getZoneOwner(id);
             path.css({
-                fill: owner === 0 ? colors.player1.zone : colors.player2.zone,
+                fill: owner === 0 ? COLORS.player1.zone : COLORS.player2.zone,
             });
         });
     };
@@ -220,8 +204,8 @@ export const UI = (() => {
                 zone.css({
                     fill:
                         Board.getZoneOwner(SVG.parseSvgToId(zone)) === 0
-                            ? colors.player1.highlight
-                            : colors.player2.highlight,
+                            ? COLORS.player1.highlight
+                            : COLORS.player2.highlight,
                     transition: '500ms',
                 });
             });
@@ -229,8 +213,8 @@ export const UI = (() => {
             zones.css({
                 fill:
                     Board.getZoneOwner(SVG.parseSvgToId(zones)) === 0
-                        ? colors.player1.highlight
-                        : colors.player2.highlight,
+                        ? COLORS.player1.highlight
+                        : COLORS.player2.highlight,
                 transition: '500ms',
             });
         }
@@ -242,8 +226,8 @@ export const UI = (() => {
                 zone.css({
                     fill:
                         Board.getZoneOwner(SVG.parseSvgToId(zone)) === 0
-                            ? colors.player1.zone
-                            : colors.player2.zone,
+                            ? COLORS.player1.zone
+                            : COLORS.player2.zone,
                     transition: '500ms',
                 });
             });
@@ -251,8 +235,8 @@ export const UI = (() => {
             zones.css({
                 fill:
                     Board.getZoneOwner(SVG.parseSvgToId(zones)) === 0
-                        ? colors.player1.zone
-                        : colors.player2.zone,
+                        ? COLORS.player1.zone
+                        : COLORS.player2.zone,
                 transition: '500ms',
             });
         } else {
@@ -260,8 +244,8 @@ export const UI = (() => {
                 path.css({
                     fill:
                         Board.getZoneOwner(SVG.parseSvgToId(path)) === 0
-                            ? colors.player1.zone
-                            : colors.player2.zone,
+                            ? COLORS.player1.zone
+                            : COLORS.player2.zone,
                     transition: '500ms',
                 });
             });

@@ -1,10 +1,10 @@
-export const PHASES = Object.freeze({
+const PHASES = Object.freeze({
     DRAFT: 0,
     ATTACK: 1,
     FORTIFY: 2,
 });
 
-export const PHASE_MAP_SQUARE_ID = Object.freeze(
+const PHASE_MAP_SQUARE_ID = Object.freeze(
     new Map([
         [PHASES['DRAFT'], 'phase-square-draft'],
         [PHASES['ATTACK'], 'phase-square-attack'],
@@ -12,7 +12,7 @@ export const PHASE_MAP_SQUARE_ID = Object.freeze(
     ])
 );
 
-export const PHASE_MAP_NAME = Object.freeze(
+const PHASE_MAP_NAME = Object.freeze(
     new Map([
         [PHASES['DRAFT'], 'Draft Phase'],
         [PHASES['ATTACK'], 'Attack Phase'],

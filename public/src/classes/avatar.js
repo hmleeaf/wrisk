@@ -1,4 +1,4 @@
-export const Avatar = (function () {
+const Avatar = (function () {
     // This stores the available avatars
     const avatars = {
         'Land Animals': {

@@ -1,10 +1,3 @@
-// import { STATES } from '../constants/states.js';
-import { SVG } from '../utils/svg.js';
-import { UI } from '../classes/ui.js';
-import { PHASES } from '../constants/phases.js';
-import { Board } from '../classes/board.js';
-import { Game } from '../classes/game.js';
-
 const createStateMachine = (defs) => {
     const machine = {
         state: defs.initialState,
@@ -477,7 +470,7 @@ const STATES = {
     },
 };
 
-export const GameStateMachine = createStateMachine(STATES);
+const GameStateMachine = createStateMachine(STATES);
 
 $(() => {
     $('#play_area').on('click', (e) => {

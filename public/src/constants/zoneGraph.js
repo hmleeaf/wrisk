@@ -1,4 +1,4 @@
-export default {
+const ZONE_GRAPH = {
     0: [1, 6, 13],
     1: [0, 2],
     2: [1, 3],

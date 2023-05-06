@@ -1,10 +1,4 @@
-import colors from '../constants/colors.js';
-import { GameStateMachine } from '../utils/stateMachine.js';
-import { SVG } from '../utils/svg.js';
-import { UI } from './ui.js';
-import { Board } from './board.js';
-
-export const Game = (() => {
+const Game = (() => {
     let originalZoneTroops;
     let originalNewTroops = 19; // TODO: remove when connect to socket
     let draftingZoneId;

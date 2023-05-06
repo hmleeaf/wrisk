@@ -1,4 +1,4 @@
-export const Authentication = (function () {
+const Authentication = (function () {
     // This stores the current signed-in user
     let user = null;
 

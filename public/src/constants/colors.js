@@ -1,4 +1,4 @@
-export default {
+const COLORS = {
     player1: {
         zone: '#e93423',
         background: '#d55049',
@@ -12,7 +12,3 @@ export default {
         highlight: '#99BD8C',
     },
 };
-
-/**
- * 507255 488B49 4AAD52 6EB257 C5E063
- */

@@ -1,4 +1,4 @@
-export const DICE_SVG_STRING = Object.freeze({
+const DICE_SVG_STRING = Object.freeze({
     1: `<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
             <rect stroke-width="0" rx="32" id="svg_1" height="128.125" width="127.8125" y="-0.0625" x="0.09375" stroke="#000" fill="#bf0000"/>
             <ellipse stroke-width="0" ry="12" rx="12" id="svg_8" cy="64" cx="64" stroke="#000" fill="#ffffff"/>

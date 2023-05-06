@@ -1,4 +1,4 @@
-export const SVG = (() => {
+const SVG = (() => {
     let svgPaths = [];
 
     $(() => {

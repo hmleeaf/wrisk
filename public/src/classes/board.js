@@ -1,13 +1,11 @@
-import zonesGraph from '../constants/zoneGraph.js';
-
-export const Vector2 = (_x, _y) => {
+const Vector2 = (_x, _y) => {
     const x = _x;
     const y = _y;
 
     return { x, y };
 };
 
-export const Zone = (_owner, _troop, _adjacentZoneIds) => {
+const Zone = (_owner, _troop, _adjacentZoneIds) => {
     const owner = _owner;
     const troop = _troop;
     const adjacentZoneIds = _adjacentZoneIds;
@@ -94,14 +92,14 @@ const dummyInitBoard = {
     },
 };
 
-export const Board = (() => {
+const Board = (() => {
     const zones = Object.fromEntries(
-        Object.keys(zonesGraph).map((key) => [
+        Object.keys(ZONE_GRAPH).map((key) => [
             key,
             Zone(
                 dummyInitBoard[key].owner,
                 dummyInitBoard[key].troop,
-                zonesGraph[key]
+                ZONE_GRAPH[key]
             ),
         ])
     );
