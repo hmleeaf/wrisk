@@ -51,6 +51,9 @@ export const Game = (() => {
             if (GameStateMachine.state === 'SelfAttackDeploy')
                 Board.decreaseZoneTroop(attackerZoneId);
 
+            if (GameStateMachine.state === 'SelfFortifyDeploy')
+                Board.decreaseZoneTroop(fortifyFromZoneId);
+
             return editingNewTroops;
         } else {
             return false;
@@ -68,6 +71,9 @@ export const Game = (() => {
 
             if (GameStateMachine.state === 'SelfAttackDeploy')
                 Board.increaseZoneTroop(attackerZoneId);
+
+            if (GameStateMachine.state === 'SelfFortifyDeploy')
+                Board.increaseZoneTroop(fortifyFromZoneId);
 
             return editingNewTroops;
         } else {
@@ -181,6 +187,62 @@ export const Game = (() => {
         }
     };
 
+    let fortifyFromZoneId;
+    let fortifyToZoneCandidateIds;
+    let fortifyToZoneId;
+
+    const beginFortify = (fromZone) => {
+        // fromZone undefined if back from SelfFortifyDeploy
+        if (fromZone) {
+            fortifyFromZoneId = SVG.parseSvgToId(fromZone);
+        }
+        UI.highlightBoardZones(SVG.getPathById(fortifyFromZoneId));
+
+        fortifyToZoneCandidateIds =
+            Board.getConnectedFriendlyZones(fortifyFromZoneId);
+
+        UI.highlightBoardZones(SVG.getPathsByIds(fortifyToZoneCandidateIds));
+    };
+
+    const cancelFortify = () => {
+        UI.unhighlightBoardZones();
+    };
+
+    const checkZoneCanFortifyTo = (zone) =>
+        fortifyToZoneCandidateIds.includes(SVG.parseSvgToId(zone));
+
+    let originalFortifyToTroops;
+
+    const beginFortifyDeploy = (zone) => {
+        fortifyToZoneId = SVG.parseSvgToId(zone);
+
+        console.log(fortifyFromZoneId);
+
+        originalZoneTroops = 0;
+        originalNewTroops = Board.getZoneTroop(fortifyFromZoneId) - 1;
+        draftingZoneId = fortifyToZoneId;
+        editingZoneTroops = originalZoneTroops;
+        editingNewTroops = originalNewTroops;
+        originalFortifyToTroops = Board.getZoneTroop(fortifyToZoneId);
+
+        UI.updateTroopSelectorText();
+        UI.showTroopSelector();
+        UI.hideInfoPanel();
+        UI.highlightBoardZones(
+            SVG.getPathsByIds([fortifyFromZoneId, fortifyToZoneId])
+        );
+    };
+
+    const cancelFortifyDeploy = () => {
+        UI.hideTroopSelector();
+        UI.showInfoPanel();
+        UI.unhighlightBoardZones();
+
+        Board.setZoneTroop(fortifyFromZoneId, originalNewTroops + 1);
+        Board.setZoneTroop(fortifyToZoneId, originalFortifyToTroops);
+        UI.updateBoardText();
+    };
+
     return {
         beginDraft,
         cancelDraft,
@@ -196,5 +258,10 @@ export const Game = (() => {
         battle,
         finishAttack,
         beginAttackDeploy,
+        beginFortify,
+        cancelFortify,
+        checkZoneCanFortifyTo,
+        beginFortifyDeploy,
+        cancelFortifyDeploy,
     };
 })();

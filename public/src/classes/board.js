@@ -118,6 +118,28 @@ export const Board = (() => {
     const increaseZoneTroop = (zoneId) => zones[zoneId].troop++;
     const setZoneTroop = (zoneId, troops) => (zones[zoneId].troop = troops);
 
+    const getConnectedFriendlyZones = (zoneId) => {
+        const owner = zones[zoneId].owner;
+        // dfs
+        const connectedZones = [];
+        const searchZones = [zoneId];
+        while (searchZones.length > 0) {
+            const currZone = searchZones.splice(searchZones.length - 1, 1)[0];
+            const currZoneAdjacents = zones[currZone].adjacentZoneIds;
+            const currZoneAdjacentFriendly = currZoneAdjacents.filter(
+                (zId) => zones[zId].owner === owner
+            );
+            currZoneAdjacentFriendly.forEach((adjacentZone) => {
+                if (!connectedZones.includes(adjacentZone)) {
+                    searchZones.push(adjacentZone);
+                    connectedZones.push(adjacentZone);
+                }
+            });
+        }
+
+        return connectedZones.filter((z) => z !== zoneId);
+    };
+
     return {
         getAdjacentEnemyZones,
         getZoneOwner,
@@ -125,5 +147,6 @@ export const Board = (() => {
         decreaseZoneTroop,
         increaseZoneTroop,
         setZoneTroop,
+        getConnectedFriendlyZones,
     };
 })();

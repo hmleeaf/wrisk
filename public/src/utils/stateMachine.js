@@ -155,7 +155,7 @@ const STATES = {
         },
         transitions: {
             next: {
-                target: 'SelfDraft',
+                target: 'SelfFortify',
                 action: () => {
                     console.log(
                         'transition action for "next" in "SelfAttack" state'
@@ -222,6 +222,15 @@ const STATES = {
                     Game.cancelAttack();
                 },
             },
+            next: {
+                target: 'SelfFortify',
+                action: () => {
+                    console.log(
+                        'transition action for "next" in "SelfAttackSelected" state'
+                    );
+                    Game.cancelAttack();
+                },
+            },
         },
     },
 
@@ -279,6 +288,7 @@ const STATES = {
             },
             onExit: () => {
                 console.log('SelfAttackDeploy: onExit');
+                UI.hideNotification();
             },
         },
         data: {
@@ -290,6 +300,173 @@ const STATES = {
                 action: () => {
                     console.log(
                         'transition action for "next" in "SelfAttackDeploy" state'
+                    );
+                },
+            },
+        },
+    },
+
+    SelfFortify: {
+        actions: {
+            onEnter: () => {
+                console.log('SelfFortify: onEnter');
+                UI.updateInfoPanel(true, PHASES.FORTIFY);
+                UI.showNotification(
+                    'Select a territory to move your troops from'
+                );
+            },
+            onExit: () => {
+                console.log('SelfFortify: onExit');
+                UI.hideNotification();
+            },
+        },
+        data: {
+            zoneOnClick: (e) => {
+                const path = SVG.getSvgPathByEvent(e);
+                if (path) GameStateMachine.transition('select', path);
+            },
+        },
+        transitions: {
+            next: {
+                target: 'Enemy',
+                action: () => {
+                    console.log(
+                        'transition action for "next" in "SelfFortify" state'
+                    );
+                },
+            },
+            select: {
+                target: 'SelfFortifySelected',
+                action: () => {
+                    console.log(
+                        'transition action for "select" in "SelfFortify" state'
+                    );
+                },
+            },
+        },
+    },
+
+    SelfFortifySelected: {
+        actions: {
+            onEnter: (path) => {
+                console.log('SelfFortifySelected: onEnter');
+                Game.beginFortify(path);
+                UI.showNotification(
+                    'Select an adjacent territory to move your troops to'
+                );
+            },
+            onExit: () => {
+                console.log('SelfFortifySelected: onExit');
+                Game.cancelFortify();
+                UI.hideNotification();
+            },
+        },
+        data: {
+            zoneOnClick: (e) => {
+                const path = SVG.getSvgPathByEvent(e);
+                if (path && Game.checkZoneCanFortifyTo(path))
+                    GameStateMachine.transition('select', path);
+                else if (path) GameStateMachine.transition('change', path);
+                else GameStateMachine.transition('back');
+            },
+        },
+        transitions: {
+            back: {
+                target: 'SelfFortify',
+                action: () => {
+                    console.log(
+                        'transition action for "back" in "SelfFortifySelected" state'
+                    );
+                },
+            },
+            select: {
+                target: 'SelfFortifyDeploy',
+                action: () => {
+                    console.log(
+                        'transition action for "select" in "SelfFortifySelected" state'
+                    );
+                },
+            },
+            change: {
+                target: 'SelfFortifySelected',
+                action: () => {
+                    console.log(
+                        'transition action for "change" in "SelfFortifySelected" state'
+                    );
+                },
+            },
+            next: {
+                target: 'Enemy',
+                action: () => {
+                    console.log(
+                        'transition action for "next" in "SelfFortifySelected" state'
+                    );
+                },
+            },
+        },
+    },
+
+    SelfFortifyDeploy: {
+        actions: {
+            onEnter: (path) => {
+                console.log('SelfFortifyDeploy: onEnter');
+                Game.beginFortifyDeploy(path);
+            },
+            onExit: () => {
+                console.log('SelfFortifyDeploy: onExit');
+            },
+        },
+        data: {
+            zoneOnClick: (e) => {},
+        },
+        transitions: {
+            back: {
+                target: 'SelfFortifySelected',
+                action: () => {
+                    console.log(
+                        'transition action for "back" in "SelfFortifyDeploy" state'
+                    );
+                    Game.cancelFortifyDeploy();
+                },
+            },
+            next: {
+                target: 'Enemy',
+                action: () => {
+                    console.log(
+                        'transition action for "next" in "SelfFortifyDeploy" state'
+                    );
+                },
+            },
+            select: {
+                target: 'SelfFortifySelected',
+                action: () => {
+                    console.log(
+                        'transition action for "select" in "SelfFortifyDeploy" state'
+                    );
+                },
+            },
+        },
+    },
+
+    Enemy: {
+        actions: {
+            onEnter: () => {
+                console.log('Enemy: onEnter');
+                UI.updateInfoPanel(false, PHASES.DRAFT);
+            },
+            onExit: () => {
+                console.log('Enemy: onExit');
+            },
+        },
+        data: {
+            zoneOnClick: (e) => {},
+        },
+        transitions: {
+            next: {
+                target: 'SelfDraft',
+                action: () => {
+                    console.log(
+                        'transition action for "next" in "Enemy" state'
                     );
                 },
             },
