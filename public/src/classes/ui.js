@@ -1,4 +1,5 @@
 import colors from '../constants/colors.js';
+import { DICE_SVG_STRING } from '../constants/dice.js';
 import {
     PHASES,
     PHASE_MAP_NAME,
@@ -178,6 +179,22 @@ export const UI = (() => {
         }
     };
 
+    const outlineBoardZone = (zone) => {
+        zone.css({
+            stroke: '#fff',
+            transition: '500ms',
+        });
+    };
+
+    const unoutlineBoardZone = () => {
+        SVG.getPaths().forEach((path) => {
+            path.css({
+                stroke: '#000',
+                transition: '500ms',
+            });
+        });
+    };
+
     const getTroopByZone = (zone) =>
         parseInt($('#zone_text_' + SVG.parseSvgToId(zone)).text());
 
@@ -188,6 +205,11 @@ export const UI = (() => {
 
     const hideTroopSelector = () => {
         $('#popup-troops-selector').hide();
+        $('#troops-cancel-button').css({ visibility: 'visible' });
+    };
+
+    const hideTroopSelectorCancelButton = () => {
+        $('#troops-cancel-button').css({ visibility: 'hidden' });
     };
 
     const showInfoPanel = () => {
@@ -225,39 +247,80 @@ export const UI = (() => {
         $('#battle-screen').fadeOut();
     };
 
-    const updateRolls = (attackRolls, defendRolls) => {
-        $('#self-dice-1').show();
-        $('#self-dice-2').show();
-        $('#self-dice-3').show();
-        $('#enemy-dice-1').show();
-        $('#enemy-dice-2').show();
+    const battleScreenDisableInteraction = () => {
+        $('#battle-buttons-wrapper').children().css({ visibility: 'hidden' });
+        $('#close-battle-button').hide();
+    };
+
+    const battleScreenEnableInteraction = () => {
+        $('#battle-buttons-wrapper').children().css({ visibility: 'visible' });
+        $('#close-battle-button').show();
+    };
+
+    const createDice = (faceValue) => $(DICE_SVG_STRING[faceValue]);
+
+    const animateRolls = (attackDice, defendDice) => {
         for (let i = 0; i < 3; ++i) {
-            if (attackRolls[i]) $('#self-dice-' + (i + 1)).text(attackRolls[i]);
-            else $('#self-dice-' + (i + 1)).hide();
+            const diceDiv = $('#self-dice-' + (i + 1));
+            if (i < attackDice) diceDiv.show();
+            else diceDiv.hide();
         }
         for (let i = 0; i < 2; ++i) {
-            if (defendRolls[i])
-                $('#enemy-dice-' + (i + 1)).text(defendRolls[i]);
-            else $('#enemy-dice-' + (i + 1)).hide();
+            const diceDiv = $('#enemy-dice-' + (i + 1));
+            if (i < defendDice) diceDiv.show();
+            else diceDiv.hide();
+        }
+        return setInterval(() => {
+            for (let i = 0; i < attackDice; ++i) {
+                const diceDiv = $('#self-dice-' + (i + 1));
+                diceDiv.empty();
+                diceDiv.append(createDice(Game.randomRollValue()));
+            }
+            for (let i = 0; i < defendDice; ++i) {
+                const diceDiv = $('#enemy-dice-' + (i + 1));
+                diceDiv.empty();
+                diceDiv.append(createDice(Game.randomRollValue()));
+            }
+        }, 50);
+    };
+
+    const updateRolls = (attackRolls, defendRolls) => {
+        for (let i = 0; i < 3; ++i) {
+            const diceDiv = $('#self-dice-' + (i + 1));
+            if (attackRolls[i]) {
+                diceDiv.show();
+                diceDiv.empty();
+                diceDiv.append(createDice(attackRolls[i]));
+            } else diceDiv.hide();
+        }
+        for (let i = 0; i < 2; ++i) {
+            const diceDiv = $('#enemy-dice-' + (i + 1));
+            if (defendRolls[i]) {
+                diceDiv.show();
+                diceDiv.empty();
+                diceDiv.append(createDice(defendRolls[i]));
+            } else diceDiv.hide();
         }
     };
 
     const resetRolls = (attackerZoneId, defenderZoneId) => {
-        const attackerTroops = Board.getZoneTroop(attackerZoneId);
+        const attackerTroops = Board.getZoneTroop(attackerZoneId) - 1;
         const defenderTroops = Board.getZoneTroop(defenderZoneId);
         for (let i = 0; i < 3; ++i) {
+            const diceDiv = $('#self-dice-' + (i + 1));
             if (i < attackerTroops) {
-                $('#self-dice-' + (i + 1)).show();
-                $('#self-dice-' + (i + 1)).text('?');
-                $('#self-dice-' + (i + 1)).css({ color: 'white' });
-            } else $('#self-dice-' + (i + 1)).hide();
+                diceDiv.show();
+                diceDiv.empty();
+                diceDiv.append(createDice(0));
+            } else diceDiv.hide();
         }
         for (let i = 0; i < 2; ++i) {
+            const diceDiv = $('#enemy-dice-' + (i + 1));
             if (i < defenderTroops) {
-                $('#enemy-dice-' + (i + 1)).show();
-                $('#enemy-dice-' + (i + 1)).text('?');
-                $('#enemy-dice-' + (i + 1)).css({ color: 'white' });
-            } else $('#enemy-dice-' + (i + 1)).hide();
+                diceDiv.show();
+                diceDiv.empty();
+                diceDiv.append(createDice(0));
+            } else diceDiv.hide();
         }
     };
 
@@ -269,9 +332,9 @@ export const UI = (() => {
         $('#enemy-dice-2').css({ color: 'white' });
         rollResults.forEach((result, idx) => {
             if (result) {
-                $('#enemy-dice-' + (idx + 1)).css({ color: 'red' });
+                $('#enemy-dice-' + (idx + 1)).fadeOut();
             } else {
-                $('#self-dice-' + (idx + 1)).css({ color: 'red' });
+                $('#self-dice-' + (idx + 1)).fadeOut();
             }
         });
     };
@@ -297,5 +360,11 @@ export const UI = (() => {
         updateRollResults,
         updateBattleScreenTroops,
         resetRolls,
+        outlineBoardZone,
+        unoutlineBoardZone,
+        hideTroopSelectorCancelButton,
+        animateRolls,
+        battleScreenDisableInteraction,
+        battleScreenEnableInteraction,
     };
 })();

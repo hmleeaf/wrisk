@@ -315,27 +315,38 @@ ellipse {
 }
 
 #self-dice-wrapper {
-    position: absolute;
     left: 40%;
-    top: 20%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: white;
 }
 
 #enemy-dice-wrapper {
-    position: absolute;
     right: 40%;
+}
+
+.dice-wrapper {
+    position: absolute;
     top: 20%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: white;
+}
+
+#self-dice-1, #enemy-dice-1 {
+    top: 0;
+}
+
+#self-dice-2, #enemy-dice-2 {
+    top: 10vh;
+}
+
+#self-dice-3 {
+    top: 20vh;
 }
 
 .dice {
-    color: white;
+    position: absolute;
+    width: 8vh;
+    height: 8vh;
+}
+
+.dice ellipse {
+    stroke: none;
 }
 
 #battle-buttons-wrapper {

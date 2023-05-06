@@ -150,7 +150,8 @@ const STATES = {
         data: {
             zoneOnClick: (e) => {
                 const path = SVG.getSvgPathByEvent(e);
-                if (path) GameStateMachine.transition('select', path);
+                if (path && Game.checkZoneCanAttackFrom(path))
+                    GameStateMachine.transition('select', path);
             },
         },
         transitions: {
@@ -188,7 +189,7 @@ const STATES = {
         data: {
             zoneOnClick: (e) => {
                 const path = SVG.getSvgPathByEvent(e);
-                if (path && Game.checkZoneAttackable(path))
+                if (path && Game.checkZoneCanAttackTo(path))
                     GameStateMachine.transition('select', path);
                 else if (path) GameStateMachine.transition('change', path);
                 else GameStateMachine.transition('back');
@@ -323,7 +324,8 @@ const STATES = {
         data: {
             zoneOnClick: (e) => {
                 const path = SVG.getSvgPathByEvent(e);
-                if (path) GameStateMachine.transition('select', path);
+                if (path && Game.checkZoneCanFortifyFrom(path))
+                    GameStateMachine.transition('select', path);
             },
         },
         transitions: {
@@ -366,7 +368,8 @@ const STATES = {
                 const path = SVG.getSvgPathByEvent(e);
                 if (path && Game.checkZoneCanFortifyTo(path))
                     GameStateMachine.transition('select', path);
-                else if (path) GameStateMachine.transition('change', path);
+                else if (path && checkZoneCanFortifyFrom(path))
+                    GameStateMachine.transition('change', path);
                 else GameStateMachine.transition('back');
             },
         },

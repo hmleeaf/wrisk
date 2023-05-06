@@ -117,6 +117,7 @@ export const Board = (() => {
     const decreaseZoneTroop = (zoneId) => zones[zoneId].troop--;
     const increaseZoneTroop = (zoneId) => zones[zoneId].troop++;
     const setZoneTroop = (zoneId, troops) => (zones[zoneId].troop = troops);
+    const setZoneOwner = (zoneId, owner) => (zones[zoneId].owner = owner);
 
     const getConnectedFriendlyZones = (zoneId) => {
         const owner = zones[zoneId].owner;
@@ -148,5 +149,6 @@ export const Board = (() => {
         increaseZoneTroop,
         setZoneTroop,
         getConnectedFriendlyZones,
+        setZoneOwner,
     };
 })();
