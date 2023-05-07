@@ -611,14 +611,6 @@ io.on('connection', (socket) => {
       success: true,
     });
 
-    io.to(room.roomCode).emit('map-update-notification', {
-      players: removeKeyFromArray(room.players, 'cards'),
-      roomCode: room.roomCode,
-      currentPlayerIndex: room.currentPlayerIndex,
-      board: room.board,
-      state: room.state,
-    })
-
     io.to(room.players[room.currentPlayerIndex].socketID).emit('draft-notification', {
       players: removeKeyFromArray(room.players, 'cards'),
       roomCode: room.roomCode,
@@ -959,17 +951,19 @@ io.on('connection', (socket) => {
         })
         return;
       }
-      if (rooms[roomIndex].attackRecorded) {
-        const card = drawRandomCard(cardTypes);
-        rooms[roomIndex].players[rooms[roomIndex].currentPlayerIndex].cards.push(card);
-        socket.emit('update-cards-notification', {
-          cards: room.players[room.currentPlayerIndex].cards
-        })
-      }
 
       rooms[roomIndex].board.territories[fromTerritoryIndex].troops -= req.fortifyTroops;
       rooms[roomIndex].board.territories[toTerritoryIndex].troops += req.fortifyTroops;
     }
+
+    if (rooms[roomIndex].attackRecorded) {
+      const card = drawRandomCard(cardTypes);
+      rooms[roomIndex].players[rooms[roomIndex].currentPlayerIndex].cards.push(card);
+      socket.emit('update-cards-notification', {
+        cards: room.players[room.currentPlayerIndex].cards
+      })
+    }
+
     rooms[roomIndex].state = 'draft';
     rooms[roomIndex].attackRecorded = false;
     rooms[roomIndex].currentPlayerIndex = (rooms[roomIndex].currentPlayerIndex + 1) % playerLimit;
