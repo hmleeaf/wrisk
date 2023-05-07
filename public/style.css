@@ -180,6 +180,20 @@ button.small {
     border-width: 2px;
 }
 
+/* Flexbox related */
+.row, .col {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+}
+.col { flex-direction: column; }
+.spacer-0 { width: 0; height: 0; }
+.spacer-1 { width: 5px; height: 5px; }
+.spacer-2 { width: 10px; height: 10px; }
+.spacer-grow { flex-grow: 1; }
+
 .error {
     color: var(--error-color-text);
 }
@@ -523,9 +537,23 @@ button.small {
     padding: 8px;
 }
 
-#open-cards-button svg {
-    /* height: 100%;
-    width: 100%; */
+#end-window {
+    width: 896px;
+    height: 640px;
+}
+
+#end-title {
+    width: 480px;
+    height: 120px;
+}
+
+#end-title text {
+    font-size: 64px;
+    stroke-width: 10px;
+}
+
+.end-stat-row {
+    padding: 0;
 }
 
 /*       */
@@ -540,19 +568,7 @@ button.small {
     color: var(--material-icons-color);
 }
 
-/* Flexbox related */
-.row, .col {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 20px;
-}
-.col { flex-direction: column; }
-.spacer-0 { width: 0; height: 0; }
-.spacer-1 { width: 5px; height: 5px; }
-.spacer-2 { width: 10px; height: 10px; }
-.spacer-grow { flex-grow: 1; }
+
 
 /* Overlay */
 .overlay {

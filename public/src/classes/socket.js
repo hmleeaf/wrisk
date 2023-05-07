@@ -112,12 +112,6 @@ const Socket = (function () {
                 Game.commitFortifyDeploy();
         });
 
-        // socket.on('finish-fortify-response', (res) => {
-        //     console.log('finish-fortify-response', res);
-        //     if (!res.success) handleError(res.reason);
-        //     GameStateMachine.transition('next');
-        // });
-
         socket.on('card-redeem-response', (res) => {
             console.log('card-redeem-response', res);
             if (!res.success) handleError(res.reason);
@@ -130,6 +124,7 @@ const Socket = (function () {
 
         socket.on('end-game-notification', (res) => {
             console.log('end-game-notification', res);
+            UI.showEndScreen();
         });
     };
 

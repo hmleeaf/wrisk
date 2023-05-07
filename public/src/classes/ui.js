@@ -142,6 +142,13 @@ const UI = (() => {
     $('#battle-button').on('click', () => {
         Game.requestBattle();
     });
+    $('#end-exit-button').on('click', () => {
+        Authentication.signout(() => {
+            SignInForm.show();
+            hideEndScreen();
+            Socket.disconnect();
+        });
+    });
 
     // $(() => {
     //     updateBoardText();
@@ -436,6 +443,14 @@ const UI = (() => {
         });
     };
 
+    const showEndScreen = () => {
+        $('#end-overlay').show();
+    };
+
+    const hideEndScreen = () => {
+        $('#end-overlay').hide();
+    };
+
     // The components of the UI are put here
     const components = [SignInForm];
 
@@ -460,6 +475,18 @@ const UI = (() => {
             'player-' + ((playerIdx + 1) % 2)
         );
         $('#next-phase-button').addClass('player-' + playerIdx);
+
+        updateInfoPanel(
+            playerIdx === data.currentPlayerIndex,
+            data.state === 'draft'
+                ? PHASES.DRAFT
+                : res.state === 'attack' || res.state === 'post-attack-fortify'
+                ? PHASES.ATTACK
+                : res.state === 'fortify'
+                ? PHASES.FORTIFY
+                : undefined,
+            undefined
+        );
     };
 
     return {
@@ -491,6 +518,8 @@ const UI = (() => {
         battleScreenEnableInteraction,
         initialize,
         initializeGame,
+        showEndScreen,
+        hideEndScreen,
     };
 })();
 
@@ -518,4 +547,5 @@ $(() => {
     );
 
     Cards.initialize();
+    UI.hideEndScreen();
 });

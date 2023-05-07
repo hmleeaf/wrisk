@@ -156,7 +156,7 @@
         <div id="deployable-troops" class="text-display">
             <svg viewBox="0 0 50 50">
                 <text id="info-text" x="25" y="32">
-                    12
+                    
                 </text>
             </svg>
         </div>
@@ -193,6 +193,19 @@
     </div>
 
     <div id="notification"></div>
+
+    
+    <button id="quit-button" class="cancel">Quit</button>
+    <button id="open-cards-button">
+        <svg viewBox="0 0 128 128"">
+             <g>
+                <rect transform="rotate(30 66 70)" stroke="#000000" fill="#ffffff" x="34" y="22" width="64" height="96" rx="8" stroke-width="3"/>
+                <rect transform="rotate(30 64 64)" stroke="#000000" fill="#ffffff" x="32" y="16" width="64" height="96" rx="8" stroke-width="3"/>
+                <rect transform="rotate(30 62 58)" stroke="#000000" fill="#ffffff" x="30" y="10" width="64" height="96" rx="8" stroke-width="3"/>
+             </g>
+             <text id="cards-count-text" y="63.25" x="58">0</text>
+           </svg>
+    </button>
 
     <div id="battle-screen">
         <div id="self-troops-wrapper">
@@ -247,19 +260,7 @@
         </div>
         <button id="close-battle-button">Close</button>
     </div>
-
-    <button id="quit-button" class="cancel">Quit</button>
-    <button id="open-cards-button">
-        <svg viewBox="0 0 128 128"">
-             <g>
-                <rect transform="rotate(30 66 70)" stroke="#000000" fill="#ffffff" x="34" y="22" width="64" height="96" rx="8" stroke-width="3"/>
-                <rect transform="rotate(30 64 64)" stroke="#000000" fill="#ffffff" x="32" y="16" width="64" height="96" rx="8" stroke-width="3"/>
-                <rect transform="rotate(30 62 58)" stroke="#000000" fill="#ffffff" x="30" y="10" width="64" height="96" rx="8" stroke-width="3"/>
-             </g>
-             <text id="cards-count-text" y="63.25" x="58">0</text>
-           </svg>
-    </button>
-
+    
     <div id="cards-overlay" class="overlay">
         <div id="cards-window" class="content shadow">
             <div id="cards-container">
@@ -272,6 +273,84 @@
                 close
             </span>
         </button>
+    </div>
+
+    <div id="end-overlay" class="overlay row">
+        <div id="end-window" class="content shadow col">
+            <div id="end-title">
+                <svg viewBox="0 0 480 120">
+                    <text x="240" y="60">
+                        You lost...
+                    </text>
+                </svg>
+            </div>
+            <div id="end-stats-container" class="col">
+                <div class="end-stat-row row">
+                    <div class="end-stat-name">
+                        Troops drafted: 
+                    </div>
+                    <div class="end-stat-value">
+                        62
+                    </div>
+                </div>
+                <div class="end-stat-row row">
+                    <div class="end-stat-name">
+                        Troops drafted: 
+                    </div>
+                    <div class="end-stat-value">
+                        62
+                    </div>
+                </div>
+                <div class="end-stat-row row">
+                    <div class="end-stat-name">
+                        Troops drafted: 
+                    </div>
+                    <div class="end-stat-value">
+                        62
+                    </div>
+                </div>
+                <div class="end-stat-row row">
+                    <div class="end-stat-name">
+                        Troops drafted: 
+                    </div>
+                    <div class="end-stat-value">
+                        62
+                    </div>
+                </div>
+                <div class="end-stat-row row">
+                    <div class="end-stat-name">
+                        Troops drafted: 
+                    </div>
+                    <div class="end-stat-value">
+                        62
+                    </div>
+                </div>
+                <div class="end-stat-row row">
+                    <div class="end-stat-name">
+                        Troops drafted: 
+                    </div>
+                    <div class="end-stat-value">
+                        62
+                    </div>
+                </div>
+                <div class="end-stat-row row">
+                    <div class="end-stat-name">
+                        Troops drafted: 
+                    </div>
+                    <div class="end-stat-value">
+                        62
+                    </div>
+                </div>
+            </div>
+            <div id="end-buttons-container" class="row">
+                <button id="end-rematch-button" class="confirm">
+                    Rematch
+                </button>
+                <button id="end-exit-button" class="cancel">
+                    Exit
+                </button>
+            </div>
+        </div>
     </div>
 
     <div id="signin-overlay" class="overlay row">
