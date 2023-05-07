@@ -2,6 +2,8 @@ const Socket = (function () {
     // This stores the current Socket.IO socket
     let socket = null;
 
+    let roomCode;
+
     // This function gets the socket from the module
     const getSocket = function () {
         return socket;
@@ -17,36 +19,110 @@ const Socket = (function () {
         });
 
         socket.on('join-waiting-area-response', (res) => {
+            console.log('join-waiting-area-response', res);
             if (!res.success) handleError(res.reason);
         });
 
         socket.on('game-start-notification', (res) => {
             console.log(res);
+            roomCode = res.roomCode;
+            Board.initialize(res.board);
+            Game.initialize(res);
+            UI.initializeGame(res);
         });
 
-        socket.on('draft-notification', () => {});
+        socket.on('draft-notification', (res) => {
+            console.log('draft-notification', res);
+            if (
+                GameStateMachine.state === 'Enemy' ||
+                GameStateMachine.state === 'SelfDraftSelected'
+            ) {
+                GameStateMachine.transition('next', res.draftTroops);
+            }
+        });
 
-        socket.on('draft-response', () => {});
+        socket.on('draft-response', (res) => {
+            console.log('draft-response', res);
+            if (!res.success) handleError(res.reason);
+        });
 
-        socket.on('card-redeem-response', () => {});
+        socket.on('finish-draft-response', (res) => {
+            console.log('finish-draft-response', res);
+            if (!res.success) handleError(res.reason);
+            GameStateMachine.transition('next');
+        });
 
-        socket.on('finish-draft-response', () => {});
+        socket.on('map-update-notification', (res) => {
+            console.log('map-update-notification', res);
+            Board.updateBoard(res.board);
+            UI.updateBoardText();
+            UI.updateBoardTextBackground();
+            UI.updateBoardZones();
 
-        socket.on('map-update-notification', () => {});
+            if (GameStateMachine.state === 'Enemy') {
+                UI.updateInfoPanel(
+                    false,
+                    res.state === 'draft'
+                        ? PHASES.DRAFT
+                        : res.state === 'attack' ||
+                          res.state === 'post-attack-fortify'
+                        ? PHASES.ATTACK
+                        : res.state === 'fortify'
+                        ? PHASES.FORTIFY
+                        : undefined,
+                    undefined
+                );
+            }
+        });
 
-        socket.on('post-attack-fortify-response', () => {});
+        socket.on('post-attack-fortify-response', (res) => {
+            console.log('post-attack-fortify-response', res);
+            if (!res.success) handleError(res.reason);
+            Game.commitAttackDeploy();
+        });
 
-        socket.on('post-attack-result-notification', () => {});
+        socket.on('attack-response', (res) => {
+            console.log('attack-response', res);
+            if (!res.success) handleError(res.reason);
+            Game.battle(res);
+        });
 
-        socket.on('attack-response', () => {});
+        socket.on('finish-attack-response', (res) => {
+            console.log('finish-attack-response', res);
+            if (!res.success) handleError(res.reason);
+            GameStateMachine.transition('next');
+        });
 
-        socket.on('finish-attack-response', () => {});
+        socket.on('fortify-response', (res) => {
+            console.log('fortify-response', res);
+            if (!res.success) handleError(res.reason);
+            if (
+                GameStateMachine.state === 'SelfFortify' ||
+                GameStateMachine.state === 'SelfFortifySelected'
+            )
+                GameStateMachine.transition('next');
+            else if (GameStateMachine.state === 'SelfFortifyDeploy')
+                Game.commitFortifyDeploy();
+        });
 
-        socket.on('fortify-response', () => {});
+        // socket.on('finish-fortify-response', (res) => {
+        //     console.log('finish-fortify-response', res);
+        //     if (!res.success) handleError(res.reason);
+        //     GameStateMachine.transition('next');
+        // });
 
-        socket.on('update-cards-notification', () => {});
+        socket.on('card-redeem-response', (res) => {
+            console.log('card-redeem-response', res);
+            if (!res.success) handleError(res.reason);
+        });
 
-        socket.on('end-game-notification', () => {});
+        socket.on('update-cards-notification', (res) => {
+            console.log('update-cards-notification', res);
+        });
+
+        socket.on('end-game-notification', (res) => {
+            console.log('end-game-notification', res);
+        });
     };
 
     // This function disconnects the socket from the server
@@ -59,5 +135,72 @@ const Socket = (function () {
         console.log('error: ' + reason);
     };
 
-    return { getSocket, connect, disconnect };
+    const requestDraft = (zoneId, troops) => {
+        socket.emit('draft-request', {
+            roomCode,
+            draftRequest: { id: zoneId, troops },
+        });
+    };
+
+    const requestFinishDraft = () => {
+        socket.emit('finish-draft-request', { roomCode });
+    };
+
+    const requestFinishAttack = () => {
+        socket.emit('finish-attack-request', { roomCode });
+    };
+
+    const requestFinishFortify = () => {
+        socket.emit('fortify-request', {
+            roomCode,
+            fromID: -1,
+            toID: -1,
+            fortifyTroops: 0,
+        });
+    };
+
+    const requestAttack = (attackerID, defenderID) => {
+        socket.emit('attack-request', {
+            roomCode,
+            attackerID,
+            defenderID,
+        });
+    };
+
+    const requestAttackFortify = (
+        attackerID,
+        defenderID,
+        attackerTroops,
+        defenderTroops
+    ) => {
+        socket.emit('post-attack-fortify-request', {
+            roomCode,
+            attackerID,
+            defenderID,
+            attackerTroops,
+            defenderTroops,
+        });
+    };
+
+    const requestFortify = (fromID, toID, fortifyTroops) => {
+        socket.emit('fortify-request', {
+            roomCode,
+            fromID,
+            toID,
+            fortifyTroops,
+        });
+    };
+
+    return {
+        getSocket,
+        connect,
+        disconnect,
+        requestDraft,
+        requestFinishDraft,
+        requestFinishAttack,
+        requestFinishFortify,
+        requestAttack,
+        requestAttackFortify,
+        requestFortify,
+    };
 })();

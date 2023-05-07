@@ -1,9 +1,21 @@
 const Game = (() => {
     let originalZoneTroops;
-    let originalNewTroops = 19; // TODO: remove when connect to socket
+    let originalNewTroops;
     let draftingZoneId;
     let editingZoneTroops;
     let editingNewTroops;
+
+    const checkZoneCanDraft = (zone) => {
+        const zoneId = SVG.parseSvgToId(zone);
+        console.log(Board.getZoneOwner(zoneId), playerIdx);
+        if (Board.getZoneOwner(zoneId) !== playerIdx) return false;
+        if (originalNewTroops <= 0) return false;
+        return true;
+    };
+
+    const setDraftTroops = (draftTroops) => {
+        originalNewTroops = draftTroops;
+    };
 
     const beginDraft = (zone) => {
         UI.highlightBoardZones(zone);
@@ -24,7 +36,10 @@ const Game = (() => {
         UI.showInfoPanel();
 
         Board.setZoneTroop(draftingZoneId, originalZoneTroops);
+        editingNewTroops = originalNewTroops;
+
         UI.updateBoardText();
+        UI.updateTroopSelectorText();
     };
 
     const commitDraft = () => {
@@ -34,9 +49,14 @@ const Game = (() => {
         UI.showInfoPanel();
         UI.updateInfoPanel(undefined, undefined, editingNewTroops);
 
+        Socket.requestDraft(
+            draftingZoneId,
+            originalNewTroops - editingNewTroops
+        );
+
         originalNewTroops = editingNewTroops;
 
-        GameStateMachine.transition('next');
+        // GameStateMachine.transition('next');
     };
 
     const tryIncreaseDraft = () => {
@@ -85,7 +105,7 @@ const Game = (() => {
 
     const checkZoneCanAttackFrom = (zone) => {
         const zoneId = SVG.parseSvgToId(zone);
-        if (Board.getZoneOwner(zoneId) !== 0) return false;
+        if (Board.getZoneOwner(zoneId) !== playerIdx) return false;
         if (Board.getZoneTroop(zoneId) <= 1) return false;
         return true;
     };
@@ -121,27 +141,25 @@ const Game = (() => {
 
     const randomRollValue = () => Math.floor(Math.random() * 6) + 1;
 
-    const randomRolls = (length) =>
-        Array(length)
-            .fill(1)
-            .map(() => randomRollValue())
-            .sort((a, b) => b - a);
+    const requestBattle = () => {
+        Socket.requestAttack(attackerZoneId, defenderZoneId);
+    };
 
-    const battle = () => {
+    const battle = (result) => {
         UI.battleScreenDisableInteraction();
 
-        let attackTroops = Math.min(Board.getZoneTroop(attackerZoneId), 3);
-        if (Board.getZoneTroop(attackerZoneId) <= 3) attackTroops--;
-        const defendTroops = Math.min(Board.getZoneTroop(defenderZoneId), 2);
+        let preAttackTroops = Math.min(Board.getZoneTroop(attackerZoneId), 3);
+        if (Board.getZoneTroop(attackerZoneId) <= 3) preAttackTroops--;
+        const preDefendTroops = Math.min(Board.getZoneTroop(defenderZoneId), 2);
         const animateRollsIntervalId = UI.animateRolls(
-            attackTroops,
-            defendTroops
+            preAttackTroops,
+            preDefendTroops
         );
         setTimeout(() => {
             clearInterval(animateRollsIntervalId);
 
-            const attackRolls = randomRolls(attackTroops);
-            const defendRolls = randomRolls(defendTroops);
+            const attackRolls = result.attackerDice;
+            const defendRolls = result.defenderDice;
             UI.updateRolls(attackRolls, defendRolls);
 
             setTimeout(() => {
@@ -153,18 +171,15 @@ const Game = (() => {
                 }
                 UI.updateRollResults(rollResults);
 
-                rollResults.forEach((result) => {
-                    Board.decreaseZoneTroop(
-                        result ? defenderZoneId : attackerZoneId
-                    );
-                });
+                Board.setZoneTroop(attackerZoneId, result.attackerTroops);
+                Board.setZoneTroop(defenderZoneId, result.defenderTroops);
                 UI.updateBattleScreenTroops(attackerZoneId, defenderZoneId);
 
                 setTimeout(() => {
-                    if (Board.getZoneTroop(attackerZoneId) <= 1) {
+                    if (result.attackerTroops <= 1) {
                         // defender wins
                         GameStateMachine.transition('lose');
-                    } else if (Board.getZoneTroop(defenderZoneId) <= 0) {
+                    } else if (result.defeat) {
                         // attacker wins
                         GameStateMachine.transition(
                             'win',
@@ -214,8 +229,27 @@ const Game = (() => {
             Board.getZoneTroop(attackerZoneId) === 1 &&
             Board.getZoneTroop(defenderZoneId) === 1
         ) {
-            Game.commitDraft();
+            requestAttackDeploy();
         }
+    };
+
+    const requestAttackDeploy = () => {
+        Socket.requestAttackFortify(
+            attackerZoneId,
+            defenderZoneId,
+            Board.getZoneTroop(attackerZoneId),
+            Board.getZoneTroop(defenderZoneId)
+        );
+    };
+
+    const commitAttackDeploy = () => {
+        UI.unhighlightBoardZones();
+        UI.unoutlineBoardZone();
+        UI.hideTroopSelector();
+        UI.showInfoPanel();
+        UI.updateInfoPanel(undefined, undefined, undefined);
+
+        GameStateMachine.transition('next');
     };
 
     let fortifyFromZoneId;
@@ -224,8 +258,8 @@ const Game = (() => {
 
     const checkZoneCanFortifyFrom = (zone) => {
         const zoneId = SVG.parseSvgToId(zone);
+        if (Board.getZoneOwner(zoneId) !== playerIdx) return false;
         if (Board.getZoneTroop(zoneId) <= 1) return false;
-        if (Board.getZoneOwner(zoneId) !== 0) return false;
         return true;
     };
 
@@ -256,8 +290,6 @@ const Game = (() => {
     const beginFortifyDeploy = (zone) => {
         fortifyToZoneId = SVG.parseSvgToId(zone);
 
-        console.log(fortifyFromZoneId);
-
         originalZoneTroops = 0;
         originalNewTroops = Board.getZoneTroop(fortifyFromZoneId) - 1;
         draftingZoneId = fortifyToZoneId;
@@ -273,6 +305,24 @@ const Game = (() => {
         );
     };
 
+    const requestFortifyDeploy = () => {
+        Socket.requestFortify(
+            fortifyFromZoneId,
+            fortifyToZoneId,
+            originalNewTroops - editingNewTroops
+        );
+    };
+
+    const commitFortifyDeploy = () => {
+        UI.unhighlightBoardZones();
+        UI.unoutlineBoardZone();
+        UI.hideTroopSelector();
+        UI.showInfoPanel();
+        UI.updateInfoPanel(undefined, undefined, editingNewTroops);
+
+        GameStateMachine.transition('next');
+    };
+
     const cancelFortifyDeploy = () => {
         UI.hideTroopSelector();
         UI.showInfoPanel();
@@ -281,6 +331,23 @@ const Game = (() => {
         Board.setZoneTroop(fortifyFromZoneId, originalNewTroops + 1);
         Board.setZoneTroop(fortifyToZoneId, originalFortifyToTroops);
         UI.updateBoardText();
+    };
+
+    let playerIdx;
+    let currPlayerIdx;
+
+    const initialize = (data) => {
+        playerIdx = data.players.findIndex(
+            (player) =>
+                player.user.username === Authentication.getUser().username
+        );
+        currPlayerIdx = data.currentPlayerIndex;
+
+        console.log(playerIdx);
+
+        UI.updateBoardText();
+        UI.updateBoardTextBackground();
+        UI.updateBoardZones();
     };
 
     return {
@@ -306,5 +373,13 @@ const Game = (() => {
         randomRollValue,
         checkZoneCanFortifyFrom,
         checkZoneCanAttackFrom,
+        initialize,
+        setDraftTroops,
+        checkZoneCanDraft,
+        requestBattle,
+        requestAttackDeploy,
+        commitAttackDeploy,
+        requestFortifyDeploy,
+        commitFortifyDeploy,
     };
 })();

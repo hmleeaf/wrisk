@@ -1,7 +1,7 @@
-const createStateMachine = (defs) => {
+const createStateMachine = (defs, initialState) => {
     const machine = {
-        state: defs.initialState,
-        data: defs[defs.initialState].data,
+        state: initialState,
+        data: defs[initialState].data,
         transition: (event, data = undefined) => {
             const currStateDef = defs[machine.state];
             const destTransition = currStateDef.transitions[event];
@@ -26,19 +26,18 @@ const createStateMachine = (defs) => {
     };
 
     // directly invoke initial state's onEnter on initialization
-    defs[defs.initialState].actions.onEnter();
+    defs[initialState].actions.onEnter();
 
     return machine;
 };
 
 const STATES = {
-    initialState: 'SelfDraft',
-
     SelfDraft: {
         actions: {
-            onEnter: () => {
+            onEnter: (troops) => {
                 console.log('SelfDraft: onEnter');
-                UI.updateInfoPanel(true, PHASES.DRAFT);
+                if (troops !== undefined) Game.setDraftTroops(troops);
+                UI.updateInfoPanel(true, PHASES.DRAFT, troops);
                 UI.showNotification(
                     'Tap any of your territories to begin deploying troops'
                 );
@@ -51,7 +50,8 @@ const STATES = {
         data: {
             zoneOnClick: (e) => {
                 const path = SVG.getSvgPathByEvent(e);
-                if (path) GameStateMachine.transition('select', path);
+                if (path && Game.checkZoneCanDraft(path))
+                    GameStateMachine.transition('select', path);
             },
         },
         transitions: {
@@ -92,7 +92,8 @@ const STATES = {
         data: {
             zoneOnClick: (e) => {
                 const path = SVG.getSvgPathByEvent(e);
-                if (path) GameStateMachine.transition('select', path);
+                if (path && Game.checkZoneCanDraft(path))
+                    GameStateMachine.transition('select', path);
                 else GameStateMachine.transition('back');
             },
         },
@@ -184,7 +185,8 @@ const STATES = {
                 const path = SVG.getSvgPathByEvent(e);
                 if (path && Game.checkZoneCanAttackTo(path))
                     GameStateMachine.transition('select', path);
-                else if (path) GameStateMachine.transition('change', path);
+                else if (path && Game.checkZoneCanAttackFrom(path))
+                    GameStateMachine.transition('change', path);
                 else GameStateMachine.transition('back');
             },
         },
@@ -470,16 +472,10 @@ const STATES = {
     },
 };
 
-const GameStateMachine = createStateMachine(STATES);
+const GameStateMachine = createStateMachine(STATES, 'Enemy');
 
 $(() => {
     $('#play_area').on('click', (e) => {
         GameStateMachine.data.zoneOnClick(e);
-    });
-
-    $(document).on('keydown', (e) => {
-        if (e.key === 'Enter') {
-            GameStateMachine.transition('next');
-        }
     });
 });

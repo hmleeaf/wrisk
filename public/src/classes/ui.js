@@ -97,6 +97,8 @@ const UI = (() => {
             cy: $(value).attr('cy') - 7,
         });
     });
+
+    // set up events
     $('#troops-increase-button').on('click', () => {
         if (Game.tryIncreaseDraft() === false) return;
 
@@ -113,26 +115,42 @@ const UI = (() => {
         GameStateMachine.transition('back');
     });
     $('#troops-confirm-button').on('click', () => {
-        Game.commitDraft();
+        if (GameStateMachine.state === 'SelfDraftSelected') Game.commitDraft();
+        else if (GameStateMachine.state === 'SelfAttackDeploy')
+            Game.requestAttackDeploy();
+        else if (GameStateMachine.state === 'SelfFortifyDeploy')
+            Game.requestFortifyDeploy();
     });
     $('#next-phase-button').on('click', () => {
-        GameStateMachine.transition('next');
+        if (GameStateMachine.state === 'SelfDraft') {
+            Socket.requestFinishDraft();
+        } else if (
+            GameStateMachine.state === 'SelfAttack' ||
+            GameStateMachine.state === 'SelfAttackSelected'
+        ) {
+            Socket.requestFinishAttack();
+        } else if (
+            GameStateMachine.state === 'SelfFortify' ||
+            GameStateMachine.state === 'SelfFortifySelected'
+        ) {
+            Socket.requestFinishFortify();
+        }
     });
     $('#close-battle-button').on('click', () => {
         Game.cancelAttackBattle();
     });
     $('#battle-button').on('click', () => {
-        Game.battle();
+        Game.requestBattle();
     });
 
-    $(() => {
-        updateBoardText();
-        updateBoardTextBackground();
-        updateBoardZones();
-    });
+    // $(() => {
+    //     updateBoardText();
+    //     updateBoardTextBackground();
+    //     updateBoardZones();
+    // });
 
     const updateBoardTextBackground = () => {
-        $('ellipse').each((_, value) => {
+        $('g#text-backgrounds ellipse').each((_, value) => {
             const ellipse = $(value);
             const id = SVG.parseSvgToId(ellipse);
             const owner = Board.getZoneOwner(id);
@@ -150,9 +168,8 @@ const UI = (() => {
     };
 
     const updateBoardText = () => {
-        $('text').each((_, value) => {
+        $('g#texts text').each((_, value) => {
             const text = $(value);
-            if (!text.attr('id').includes('zone')) return;
             const id = SVG.parseSvgToId(text);
             const troop = Board.getZoneTroop(id);
             text.text(troop);
@@ -160,9 +177,8 @@ const UI = (() => {
     };
 
     const updateBoardZones = () => {
-        $('path').each((_, value) => {
+        $('g#areas path').each((_, value) => {
             const path = $(value);
-            if (!path.attr('id').includes('zone')) return;
             const id = SVG.parseSvgToId(path);
             const owner = Board.getZoneOwner(id);
             path.css({
@@ -176,21 +192,29 @@ const UI = (() => {
             (phase !== undefined || null) &&
             (isSelfTurn !== undefined || null)
         ) {
-            $('.phase-square').removeClass('activeSelf');
-            $('.phase-square').removeClass('activeEnemy');
+            $('.phase-square').removeClass('player-0');
+            $('.phase-square').removeClass('player-1');
             $('#' + PHASE_MAP_SQUARE_ID.get(phase)).addClass(
-                isSelfTurn ? 'activeSelf' : 'activeEnemy'
+                isSelfTurn
+                    ? 'player-' + playerIdx
+                    : 'player-' + ((playerIdx + 1) % 2)
             );
             $('#phase-text').text(
                 (isSelfTurn ? 'Your ' : "Enemy's ") + PHASE_MAP_NAME.get(phase)
             );
-            $('#next-phase-button').removeClass('self');
-            $('#next-phase-button').removeClass('enemy');
-            $('#next-phase-button').addClass(isSelfTurn ? 'self' : 'enemy');
+            if (isSelfTurn)
+                $('#next-phase-button').css({ visibility: 'visible' });
+            else $('#next-phase-button').css({ visibility: 'hidden' });
         }
 
         if (troops !== undefined || null) {
             $('#info-text').text(troops);
+
+            if (troops > 0) {
+                $('#next-phase-button').prop('disabled', true);
+            } else {
+                $('#next-phase-button').prop('disabled', false);
+            }
         }
     };
 
@@ -423,6 +447,21 @@ const UI = (() => {
         }
     };
 
+    let playerIdx;
+
+    const initializeGame = (data) => {
+        playerIdx = data.players.findIndex(
+            (player) =>
+                player.user.username === Authentication.getUser().username
+        );
+        $('#deployable-troops').addClass('player-' + playerIdx);
+        $('#self-troops-text-wrapper').addClass('player-' + playerIdx);
+        $('#enemy-troops-text-wrapper').addClass(
+            'player-' + ((playerIdx + 1) % 2)
+        );
+        $('#next-phase-button').addClass('player-' + playerIdx);
+    };
+
     return {
         updateInfoPanel,
         highlightBoardZones,
@@ -451,6 +490,7 @@ const UI = (() => {
         battleScreenDisableInteraction,
         battleScreenEnableInteraction,
         initialize,
+        initializeGame,
     };
 })();
 

@@ -1,11 +1,11 @@
 :root {
-    --player1-color-zone: #e93423;
-    --player1-color-background: #d55049;
-    --player1-color-outline: #802f2e;
+    --player0-color-zone: #e93423;
+    --player0-color-background: #d55049;
+    --player0-color-outline: #802f2e;
 
-    --player2-color-zone: #557c47;
-    --player2-color-background: #add773;
-    --player2-color-outline: #628146;
+    --player1-color-zone: #557c47;
+    --player1-color-background: #add773;
+    --player1-color-outline: #628146;
 
     --popup-background-color-transparent: rgba(0, 0, 0, 0.5);
     --notification-background-color-transparent: rgba(255, 255, 255, 0.8);
@@ -121,9 +121,8 @@ ellipse {
     width: 64px;
     height: 64px;
     border-radius: 32px;
-    border: solid 3px var(--player1-color-outline);
+    border: solid 3px #000;
     font-size: 32px;
-    background-color: var(--player1-color-background);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -137,16 +136,6 @@ ellipse {
 .text-display text {
     text-anchor: middle;
     stroke-width: 5px;
-    stroke: var(--player1-color-outline);
-}
-
-.text-display.enemy {
-    border-color: var(--player2-color-outline);
-    background-color: var(--player2-color-background);
-}
-
-.text-display.enemy text {
-    stroke: var(--player2-color-outline);
 }
 
 .no-backdrop {
@@ -187,16 +176,6 @@ ellipse {
     border: solid 3px black;
 }
 
-.phase-square.activeSelf {
-    background-color: var(--player1-color-background);
-    border-color: var(--player1-color-outline);
-}
-
-.phase-square.activeEnemy {
-    background-color: var(--player2-color-background);
-    border-color: var(--player2-color-outline);
-}
-
 #next-phase-button {
     width: 240px;
     height: 64px;
@@ -227,7 +206,6 @@ ellipse {
     display: flex;
     align-items: center;
     justify-content: center;
-    
 }
 
 .troop-button:hover {
@@ -238,29 +216,22 @@ ellipse {
     filter:brightness(0.9);
 }
 
+.troop-button:disabled {
+    pointer-events: none;
+    cursor: default;
+    background-color: #999999;
+    border-color: #444444;
+}
+
+.troop-button:disabled text {
+    stroke: #444444;
+}
+
 .troop-button.small {
     width: 48px;
     height: 48px;
     border-radius: 24px;
     border-width: 2px;
-}
-
-.troop-button.self {
-    background-color: var(--player1-color-background);
-    border-color: var(--player1-color-outline);
-}
-
-.troop-button.self text {
-    stroke: var(--player1-color-outline);
-}
-
-.troop-button.enemy {
-    background-color: var(--player2-color-background);
-    border-color: var(--player2-color-outline);
-}
-
-.troop-button.enemy text {
-    stroke: var(--player2-color-outline);
 }
 
 #troops-cancel-button {
@@ -423,6 +394,24 @@ ellipse {
     position: absolute;
     right: 20vh;
     top: 5vh;
+}
+
+.player-0 {
+    border-color: var(--player0-color-outline);
+    background-color: var(--player0-color-background);
+}
+
+.player-0 text {
+    stroke: var(--player0-color-outline);
+}
+
+.player-1 {
+    border-color: var(--player1-color-outline);
+    background-color: var(--player1-color-background);
+}
+
+.player-1 text {
+    stroke: var(--player1-color-outline);
 }
 
 /*       */
