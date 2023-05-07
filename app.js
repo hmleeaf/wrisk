@@ -177,25 +177,25 @@ const playerLimit = 2;
 
 const maps = [{
   territories: [
-    { id: 0, neighbours: [1, 6, 13] },
-    { id: 1, neighbours: [0, 2] },
-    { id: 2, neighbours: [1, 3] },
-    { id: 3, neighbours: [2, 4, 5] },
-    { id: 4, neighbours: [3, 5, 18] },
-    { id: 5, neighbours: [3, 4, 10] },
-    { id: 6, neighbours: [0, 8] },
-    { id: 7, neighbours: [8, 9] },
-    { id: 8, neighbours: [6, 7, 9, 13] },
-    { id: 9, neighbours: [7, 8, 10, 13, 14, 15] },
-    { id: 10, neighbours: [5, 9, 11, 15] },
-    { id: 11, neighbours: [10, 12, 15] },
-    { id: 12, neighbours: [11, 17] },
-    { id: 13, neighbours: [0, 8, 9, 14] },
-    { id: 14, neighbours: [9, 13, 15, 16] },
-    { id: 15, neighbours: [9, 10, 11, 14, 16] },
-    { id: 16, neighbours: [14, 15, 17, 18] },
-    { id: 17, neighbours: [12, 16, 18] },
-    { id: 18, neighbours: [4, 16, 17] },
+    {id: 0, neighbours: [1, 6, 13]},
+    {id: 1, neighbours: [0, 2]},
+    {id: 2, neighbours: [1, 3]},
+    {id: 3, neighbours: [2, 4, 5]},
+    {id: 4, neighbours: [3, 5, 18]},
+    {id: 5, neighbours: [3, 4, 10]},
+    {id: 6, neighbours: [0, 8]},
+    {id: 7, neighbours: [8, 9]},
+    {id: 8, neighbours: [6, 7, 9, 13]},
+    {id: 9, neighbours: [7, 8, 10, 13, 14, 15]},
+    {id: 10, neighbours: [5, 9, 11, 15]},
+    {id: 11, neighbours: [10, 12, 15]},
+    {id: 12, neighbours: [11, 17]},
+    {id: 13, neighbours: [0, 8, 9, 14]},
+    {id: 14, neighbours: [9, 13, 15, 16]},
+    {id: 15, neighbours: [9, 10, 11, 14, 16]},
+    {id: 16, neighbours: [14, 15, 17, 18]},
+    {id: 17, neighbours: [12, 16, 18]},
+    {id: 18, neighbours: [4, 16, 17]},
   ],
   continents: [
     {name: 'asia', territories: [13, 14, 15, 16], bonus: 4},
@@ -611,6 +611,14 @@ io.on('connection', (socket) => {
       success: true,
     });
 
+    io.to(room.roomCode).emit('map-update-notification', {
+      players: removeKeyFromArray(room.players, 'cards'),
+      roomCode: room.roomCode,
+      currentPlayerIndex: room.currentPlayerIndex,
+      board: room.board,
+      state: room.state,
+    })
+
     io.to(room.players[room.currentPlayerIndex].socketID).emit('draft-notification', {
       players: removeKeyFromArray(room.players, 'cards'),
       roomCode: room.roomCode,
@@ -924,25 +932,26 @@ io.on('connection', (socket) => {
       })
       return;
     }
-    const fromTerritoryIndex = room.board.territories.findIndex(territory => territory.id == req.fromID);
-    const toTerritoryIndex = room.board.territories.findIndex(territory => territory.id == req.toID);
-    const fromTerritory = room.board.territories.find(territory => territory.id == req.fromID);
-    const toTerritory = room.board.territories.find(territory => territory.id == req.toID);
-    if (fromTerritory.owner !== room.currentPlayerIndex || toTerritory.owner !== room.currentPlayerIndex) {
-      socket.emit('fortify-response', {
-        success: false,
-        reason: 'You do not own the requested territory.'
-      })
-      return;
-    }
-    if (fromTerritory.troops - req.fortifyTroops < 1) {
-      socket.emit('fortify-response', {
-        success: false,
-        reason: 'You do not have enough troops to fortify.'
-      })
-      return;
-    }
     if (!(req.fromID == -1 && req.toID == -1)) {
+      const fromTerritoryIndex = room.board.territories.findIndex(territory => territory.id == req.fromID);
+      const toTerritoryIndex = room.board.territories.findIndex(territory => territory.id == req.toID);
+      const fromTerritory = room.board.territories.find(territory => territory.id == req.fromID);
+      const toTerritory = room.board.territories.find(territory => territory.id == req.toID);
+      if (fromTerritory.owner !== room.currentPlayerIndex || toTerritory.owner !== room.currentPlayerIndex) {
+        socket.emit('fortify-response', {
+          success: false,
+          reason: 'You do not own the requested territory.'
+        })
+        return;
+      }
+      if (fromTerritory.troops - req.fortifyTroops < 1) {
+        socket.emit('fortify-response', {
+          success: false,
+          reason: 'You do not have enough troops to fortify.'
+        })
+        return;
+      }
+
       if (!isConnected(room.board, req.fromID, req.toID, room.currentPlayerIndex)) {
         socket.emit('fortify-response', {
           success: false,
