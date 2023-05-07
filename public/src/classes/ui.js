@@ -21,9 +21,7 @@ const SignInForm = (function () {
                 username,
                 password,
                 () => {
-                    hide();
-                    // Authentication.getUser()
-
+                    Authentication.getUser();
                     Socket.connect();
                 },
                 (error) => {
@@ -78,6 +76,20 @@ const SignInForm = (function () {
         $('#signin-message').text('');
         $('#register-message').text('');
         $('#signin-overlay').fadeOut(500);
+    };
+
+    return { initialize, show, hide };
+})();
+
+const WaitingOverlay = (() => {
+    const initialize = () => {};
+
+    const show = () => {
+        $('#waiting-overlay').show();
+    };
+
+    const hide = () => {
+        $('#waiting-overlay').hide();
     };
 
     return { initialize, show, hide };
@@ -537,12 +549,11 @@ $(() => {
     // Validate the signin
     Authentication.validate(
         () => {
-            SignInForm.hide();
-
             Socket.connect();
         },
         () => {
             SignInForm.show();
+            WaitingOverlay.hide();
         }
     );
 

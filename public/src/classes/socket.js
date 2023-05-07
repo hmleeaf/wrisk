@@ -21,9 +21,13 @@ const Socket = (function () {
         socket.on('join-waiting-area-response', (res) => {
             console.log('join-waiting-area-response', res);
             if (!res.success) handleError(res.reason);
+            SignInForm.hide();
+            WaitingOverlay.show();
         });
 
         socket.on('game-start-notification', (res) => {
+            WaitingOverlay.hide();
+            SignInForm.hide();
             console.log(res);
             roomCode = res.roomCode;
             Board.initialize(res.board);

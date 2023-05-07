@@ -556,6 +556,11 @@ button.small {
     padding: 0;
 }
 
+#waiting-window {
+    width: 640px;
+    height: 320px;
+}
+
 /*       */
 /* Login */
 /*       */
@@ -567,8 +572,6 @@ button.small {
 .material-icons {
     color: var(--material-icons-color);
 }
-
-
 
 /* Overlay */
 .overlay {
