@@ -5,7 +5,7 @@ const SignInForm = (function () {
         Avatar.populate($('#register-avatar'));
 
         // Hide it
-        $('#signin-overlay').hide();
+        // $('#signin-overlay').hide();
 
         // Submit event for the signin form
         $('#signin-form').on('submit', (e) => {
@@ -224,10 +224,25 @@ const UI = (() => {
             if (isSelfTurn)
                 $('#next-phase-button').css({ visibility: 'visible' });
             else $('#next-phase-button').css({ visibility: 'hidden' });
+
+            if (phase === PHASES.ATTACK && isSelfTurn)
+                $('#dice-spinner-wrapper').show();
+            else $('#dice-spinner-wrapper').hide();
+
+            if (phase !== PHASES.DRAFT) $('#deployable-troops-text').text('');
+
+            // if (!isSelfTurn) $('#info-panel-display').hide();
+            // else $('#info-panel-display').show();
+
+            $('#deployable-troops').removeClass('player-0');
+            $('#deployable-troops').removeClass('player-1');
+            $('#deployable-troops').addClass(
+                'player-' + (isSelfTurn ? playerIdx : (playerIdx + 1) % 2)
+            );
         }
 
         if (troops !== undefined || null) {
-            $('#info-text').text(troops);
+            $('#deployable-troops-text').text(troops);
 
             if (troops > 0) {
                 $('#next-phase-button').prop('disabled', true);
@@ -238,7 +253,7 @@ const UI = (() => {
     };
 
     const updateTroopSelectorText = () => {
-        $('#troops-text').text(Game.getDeployableTroops);
+        $('#troops-text').text(Game.getDeployedTroops);
     };
 
     const highlightBoardZones = (zones) => {
@@ -472,6 +487,13 @@ const UI = (() => {
         for (const component of components) {
             component.initialize();
         }
+
+        setInterval(() => {
+            $('#dice-spinner-wrapper').empty();
+            $('#dice-spinner-wrapper').append(
+                DICE_SVG_STRING[Math.floor(Math.random() * 6 + 1)]
+            );
+        }, 2000);
     };
 
     let playerIdx;
@@ -481,7 +503,7 @@ const UI = (() => {
             (player) =>
                 player.user.username === Authentication.getUser().username
         );
-        $('#deployable-troops').addClass('player-' + playerIdx);
+        $('#deployable-troops').addClass('player-' + data.currentPlayerIndex);
         $('#self-troops-text-wrapper').addClass('player-' + playerIdx);
         $('#enemy-troops-text-wrapper').addClass(
             'player-' + ((playerIdx + 1) % 2)
@@ -552,7 +574,7 @@ $(() => {
             Socket.connect();
         },
         () => {
-            SignInForm.show();
+            // SignInForm.show();
             WaitingOverlay.hide();
         }
     );
