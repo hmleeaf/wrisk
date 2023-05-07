@@ -21,7 +21,7 @@ const chatSession = session({
   resave: false,
   saveUninitialized: false,
   rolling: true,
-  cookie: { maxAge: 300000 },
+  cookie: {maxAge: 300000},
 });
 app.use(chatSession);
 
@@ -33,7 +33,7 @@ function containWordCharsOnly(text) {
 // Handle the /register endpoint
 app.post('/register', (req, res) => {
   // Get the JSON data from the body
-  const { username, avatar, name, password } = req.body;
+  const {username, avatar, name, password} = req.body;
 
   //
   // D. Reading the users.json file
@@ -44,19 +44,19 @@ app.post('/register', (req, res) => {
   // E. Checking for the user data correctness
   //
   if (username === '') {
-    res.json({ status: 'error', error: 'Username cannot be empty.' });
+    res.json({status: 'error', error: 'Username cannot be empty.'});
     return;
   }
   if (avatar === '') {
-    res.json({ status: 'error', error: 'Avatar cannot be empty.' });
+    res.json({status: 'error', error: 'Avatar cannot be empty.'});
     return;
   }
   if (name === '') {
-    res.json({ status: 'error', error: 'Name cannot be empty.' });
+    res.json({status: 'error', error: 'Name cannot be empty.'});
     return;
   }
   if (password === '') {
-    res.json({ status: 'error', error: 'Password cannot be empty.' });
+    res.json({status: 'error', error: 'Password cannot be empty.'});
     return;
   }
   if (!containWordCharsOnly(username)) {
@@ -78,7 +78,7 @@ app.post('/register', (req, res) => {
   // G. Adding the new user account
   //
   const hash = bcrypt.hashSync(password, 10);
-  users[username] = { avatar, name, password: hash };
+  users[username] = {avatar, name, password: hash};
 
   //
   // H. Saving the users.json file
@@ -88,13 +88,13 @@ app.post('/register', (req, res) => {
   //
   // I. Sending a success response to the browser
   //
-  res.json({ status: 'success' });
+  res.json({status: 'success'});
 });
 
 // Handle the /signin endpoint
 app.post('/signin', (req, res) => {
   // Get the JSON data from the body
-  const { username, password } = req.body;
+  const {username, password} = req.body;
 
   //
   // D. Reading the users.json file
@@ -105,10 +105,10 @@ app.post('/signin', (req, res) => {
   // E. Checking for username/password
   //
   if (
-    !(username in users) ||
-    !bcrypt.compareSync(password, users[username].password)
+      !(username in users) ||
+      !bcrypt.compareSync(password, users[username].password)
   ) {
-    res.json({ status: 'error', error: 'Invalid username or password.' });
+    res.json({status: 'error', error: 'Invalid username or password.'});
     return;
   }
 
@@ -125,7 +125,7 @@ app.post('/signin', (req, res) => {
   req.session.user = user;
 
   // response success
-  res.json({ status: 'success', user });
+  res.json({status: 'success', user});
 });
 
 // Handle the /validate endpoint
@@ -133,13 +133,13 @@ app.get('/validate', (req, res) => {
   //
   // B. Getting req.session.user
   //
-  const { user } = req.session;
+  const {user} = req.session;
 
   //
   // D. Sending a success response with the user account
   //
-  if (user) res.json({ status: 'success', user });
-  else res.json({ status: 'error', error: 'No sessions exist.' });
+  if (user) res.json({status: 'success', user});
+  else res.json({status: 'error', error: 'No sessions exist.'});
 });
 
 // Handle the /signout endpoint
@@ -152,17 +152,19 @@ app.get('/signout', (req, res) => {
   //
   // Sending a success response
   //
-  res.json({ status: 'success' });
+  res.json({status: 'success'});
 });
 
 // setup Socket.io server
-const { createServer } = require('http');
-const { Server } = require('socket.io');
+const {createServer} = require('http');
+const {Server} = require('socket.io');
 const httpServer = createServer(app);
-const io = new Server(httpServer, {cors: {
+const io = new Server(httpServer, {
+  cors: {
     origin: "http://localhost:3000",
     methods: ["GET", "POST"],
-  },});
+  },
+});
 
 // initialize empty online users
 const onlineUsers = {};
@@ -208,10 +210,10 @@ const maps = [{
 const cardTypes = ['Infantry', 'Cavalry', 'Artillery'];
 
 const cardSets = {
-  Infantry: { cards: ['Infantry', 'Infantry', 'Infantry'], bonus: 1 },
-  Cavalry: { cards: ['Cavalry', 'Cavalry', 'Cavalry'], bonus: 2 },
-  Artillery: { cards: ['Artillery', 'Artillery', 'Artillery'], bonus: 3 },
-  All: { cards: ['Infantry', 'Cavalry', 'Artillery'], bonus: 4 },
+  Infantry: {cards: ['Infantry', 'Infantry', 'Infantry'], bonus: 1},
+  Cavalry: {cards: ['Cavalry', 'Cavalry', 'Cavalry'], bonus: 2},
+  Artillery: {cards: ['Artillery', 'Artillery', 'Artillery'], bonus: 3},
+  All: {cards: ['Infantry', 'Cavalry', 'Artillery'], bonus: 4},
 };
 
 
@@ -243,8 +245,8 @@ const generateRandomRoomCode = () => {
 
 const getRoomIndexByRoomCode = roomCode => {
   let roomIndex = -1;
-  for (let i = 0; i < rooms.length; i++){
-    if (rooms[i].roomCode === roomCode){
+  for (let i = 0; i < rooms.length; i++) {
+    if (rooms[i].roomCode === roomCode) {
       return i;
     }
   }
@@ -284,9 +286,9 @@ const initializeBoard = map => {
   //   ]}
 
   let n = playerLimit;
-  let t = Math.floor((map.territories.length * 1.8)/ n );
+  let t = Math.floor((map.territories.length * 1.8) / n);
   const shuffledTerritories = shuffleArray([...map.territories]);
-  const userTerritories = Array.from({ length: n }, () => []);
+  const userTerritories = Array.from({length: n}, () => []);
 
   for (let i = 0; i < shuffledTerritories.length; i++) {
     const userIndex = i % n;
@@ -297,16 +299,16 @@ const initializeBoard = map => {
     const owner = userTerritories.findIndex(userTerritoryIds =>
         userTerritoryIds.includes(territory.id)
     );
-    return { ...territory, owner };
+    return {...territory, owner};
   });
 
   const territoriesWithTroops = distributeTroops(updatedTerritories, userTerritories, t);
 
-  return { ...map, territories: territoriesWithTroops };
+  return {...map, territories: territoriesWithTroops};
 }
 
 function distributeTroops(territories, userTerritories, t) {
-  const territoriesWithTroops = territories.map(territory => ({ ...territory, troops: 1 }));
+  const territoriesWithTroops = territories.map(territory => ({...territory, troops: 1}));
 
   for (let i = 0; i < userTerritories.length; i++) {
     let remainingTroops = t - userTerritories[i].length;
@@ -332,14 +334,14 @@ function shuffleArray(array) {
 
 function removeKeyFromArray(arr, key) {
   return arr.map(obj => {
-    const newObj = { ...obj };
+    const newObj = {...obj};
     delete newObj[key];
     return newObj;
   });
 }
 
 function calculateDraftTroops(board, playerId) {
-  const { territories, continents } = board;
+  const {territories, continents} = board;
 
   // Calculate territories bonus
   const playerTerritories = territories.filter(t => t.owner === playerId);
@@ -364,31 +366,33 @@ function calculateDraftTroops(board, playerId) {
 }
 
 function riskAttack(attackerTroops, defenderTroops) {
-    function rollDice(numDice) {
-        const rolls = [];
-        for (let i = 0; i < numDice; i++) {
-            rolls.push(Math.floor(Math.random() * 6) + 1);
-        }
-        return rolls.sort((a, b) => b - a);
+  function rollDice(numDice) {
+    const rolls = [];
+    for (let i = 0; i < numDice; i++) {
+      rolls.push(Math.floor(Math.random() * 6) + 1);
     }
+    return rolls.sort((a, b) => b - a);
+  }
 
 
-    const attackerDice = rollDice(Math.min(attackerTroops - 1, 3));
-    const defenderDice = rollDice(Math.min(defenderTroops, 2));
+  const attackerDice = rollDice(Math.min(attackerTroops - 1, 3));
+  const defenderDice = rollDice(Math.min(defenderTroops, 2));
 
-    for (let i = 0; i < Math.min(attackerDice.length, defenderDice.length); i++) {
-        if (attackerDice[i] > defenderDice[i]) {
-            defenderTroops--;
-        } else {
-            attackerTroops--;
-        }
+  for (let i = 0; i < Math.min(attackerDice.length, defenderDice.length); i++) {
+    if (attackerDice[i] > defenderDice[i]) {
+      defenderTroops--;
+    } else {
+      attackerTroops--;
     }
+  }
 
 
-    return {
-        attackerTroops,
-        defenderTroops,
-    };
+  return {
+    attackerTroops,
+    defenderTroops,
+    attackerDice,
+    defenderDice,
+  };
 }
 
 function isConnected(board, territoryId1, territoryId2, playerId) {
@@ -467,7 +471,7 @@ io.on('connection', (socket) => {
   // add user to online
   const user = socket.request.session.user;
   if (user) {
-    onlineUsers[user.username] = { avatar: user.avatar, name: user.name };
+    onlineUsers[user.username] = {avatar: user.avatar, name: user.name};
     io.emit('add user', JSON.stringify(user));
   }
 
@@ -500,7 +504,9 @@ io.on('connection', (socket) => {
     waitingArea.push({user, socketID: socket.id});
     console.log(`User ${socket.id} has joined the waiting area.`)
     if (waitingArea.length >= playerLimit) {
-      let players = waitingArea.splice(0, playerLimit).map(player => {return {...player, cards: []}});
+      let players = waitingArea.splice(0, playerLimit).map(player => {
+        return {...player, cards: []}
+      });
       const roomCode = generateRandomRoomCode();
       for (const player of players) {
         io.sockets.sockets.get(player.socketID).join(roomCode);
@@ -565,25 +571,26 @@ io.on('connection', (socket) => {
     }
     // Validate Draft
     let requestingDraftTroops = 0;
-    for (const draftRequest of req.draftRequests) {
-      let territory = room.board.territories.find(territory => territory.id == draftRequest.id);
-      if (territory) {
-        if (territory.owner !== room.currentPlayerIndex) {
-          socket.emit('draft-response', {
-            success: false,
-            reason: `You cannot draft troops on ${draftRequest.id}.`
-          });
-          return;
-        }
-      } else {
+    let draftRequest = req.draftRequest;
+
+    let territory = room.board.territories.find(territory => territory.id == draftRequest.id);
+    if (territory) {
+      if (territory.owner !== room.currentPlayerIndex) {
         socket.emit('draft-response', {
           success: false,
-          reason: `Territory not found.`
+          reason: `You cannot draft troops on ${draftRequest.id}.`
         });
         return;
       }
-      requestingDraftTroops += draftRequest.troops;
+    } else {
+      socket.emit('draft-response', {
+        success: false,
+        reason: `Territory not found.`
+      });
+      return;
     }
+    requestingDraftTroops += draftRequest.troops;
+
     if (requestingDraftTroops > room.draftTroops) {
       socket.emit('draft-response', {
         success: false,
@@ -593,10 +600,10 @@ io.on('connection', (socket) => {
     }
 
     // Troops deployed
-    for (const draftRequest of req.draftRequests) {
-      let territoryIndex = room.board.territories.findIndex(territory => territory.id === draftRequest.id);
-      rooms[roomIndex].board.territories[territoryIndex].troops += draftRequest.troops;
-    }
+
+    let territoryIndex = room.board.territories.findIndex(territory => territory.id === draftRequest.id);
+    rooms[roomIndex].board.territories[territoryIndex].troops += draftRequest.troops;
+
 
     room.draftTroops -= requestingDraftTroops;
 
@@ -736,7 +743,7 @@ io.on('connection', (socket) => {
       })
       return;
     }
-    if (attackerTerritory.owner !== room.currentPlayerIndex || defenderTerritory === room.currentPlayerIndex ||attackerTerritory.troops <= 1){
+    if (attackerTerritory.owner !== room.currentPlayerIndex || defenderTerritory === room.currentPlayerIndex || attackerTerritory.troops <= 1) {
       socket.emit('attack-response', {
         success: false,
         reason: 'Invalid attacking or defending territory.'
@@ -747,12 +754,19 @@ io.on('connection', (socket) => {
     rooms[roomIndex].board.territories[attackerTerritoryIndex].troops = result.attackerTroops;
     rooms[roomIndex].board.territories[defenderTerritoryIndex].troops = result.defenderTroops;
 
-    socket.emit('attack-response', {
-      success: true,
-    })
-
     if (result.defenderTroops > 0) {
       //The defender survives
+      socket.emit('attack-response', {
+        success: true,
+        defeat: false,
+        attackerID: req.attackerID,
+        defenderID: req.defenderID,
+        attackerTroops: result.attackerTroops,
+        defenderTroops: result.defenderTroops,
+        attackerDice: result.attackerDice,
+        defenderDice: result.defenderDice
+      })
+
       io.to(room.roomCode).emit('map-update-notification', {
         players: removeKeyFromArray(room.players, 'cards'),
         roomCode: room.roomCode,
@@ -765,10 +779,15 @@ io.on('connection', (socket) => {
       rooms[roomIndex].state = 'post-attack-fortify';
       rooms[roomIndex].postAttackPair = {attackerID: req.attackerID, defenderID: req.defenderID}
       rooms[roomIndex].attackRecorded = true;
-      socket.emit('post-attack-result-notification', {
+      socket.emit('attack-response', {
+        success: true,
+        defeat: true,
         attackerID: req.attackerID,
         defenderID: req.defenderID,
-        troopsRemained: result.attackerTroops,
+        attackerTroops: result.attackerTroops,
+        defenderTroops: result.defenderTroops,
+        attackerDice: result.attackerDice,
+        defenderDice: result.defenderDice
       })
     }
   })
@@ -828,7 +847,7 @@ io.on('connection', (socket) => {
     rooms[roomIndex].board.territories[attackerTerritoryIndex].owner = room.currentPlayerIndex;
     rooms[roomIndex].board.territories[defenderTerritoryIndex].owner = room.currentPlayerIndex;
 
-    if(areAllLandsOwnedByOnePlayer(room.board)) {
+    if (areAllLandsOwnedByOnePlayer(room.board)) {
       rooms[roomIndex].state = 'end';
       io.to(room.roomCode).emit('end-game-notification', {
         players: removeKeyFromArray(room.players, 'cards'),
@@ -907,7 +926,7 @@ io.on('connection', (socket) => {
     }
     const fromTerritoryIndex = room.board.territories.findIndex(territory => territory.id == req.fromID);
     const toTerritoryIndex = room.board.territories.findIndex(territory => territory.id == req.toID);
-    const fromTerritory= room.board.territories.find(territory => territory.id == req.fromID);
+    const fromTerritory = room.board.territories.find(territory => territory.id == req.fromID);
     const toTerritory = room.board.territories.find(territory => territory.id == req.toID);
     if (fromTerritory.owner !== room.currentPlayerIndex || toTerritory.owner !== room.currentPlayerIndex) {
       socket.emit('fortify-response', {
@@ -923,24 +942,25 @@ io.on('connection', (socket) => {
       })
       return;
     }
+    if (!(req.fromID == -1 && req.toID == -1)) {
+      if (!isConnected(room.board, req.fromID, req.toID, room.currentPlayerIndex)) {
+        socket.emit('fortify-response', {
+          success: false,
+          reason: 'The two lands are not connected.'
+        })
+        return;
+      }
+      if (rooms[roomIndex].attackRecorded) {
+        const card = drawRandomCard(cardTypes);
+        rooms[roomIndex].players[rooms[roomIndex].currentPlayerIndex].cards.push(card);
+        socket.emit('update-cards-notification', {
+          cards: room.players[room.currentPlayerIndex].cards
+        })
+      }
 
-    if (!isConnected(room.board, req.fromID, req.toID, room.currentPlayerIndex)) {
-      socket.emit('fortify-response', {
-        success: false,
-        reason: 'The two lands are not connected.'
-      })
-      return;
+      rooms[roomIndex].board.territories[fromTerritoryIndex].troops -= req.fortifyTroops;
+      rooms[roomIndex].board.territories[toTerritoryIndex].troops += req.fortifyTroops;
     }
-    if (rooms[roomIndex].attackRecorded) {
-      const card = drawRandomCard(cardTypes);
-      rooms[roomIndex].players[rooms[roomIndex].currentPlayerIndex].cards.push(card);
-      socket.emit('update-cards-notification', {
-        cards: room.players[room.currentPlayerIndex].cards
-      })
-    }
-
-    rooms[roomIndex].board.territories[fromTerritoryIndex].troops -= req.fortifyTroops;
-    rooms[roomIndex].board.territories[toTerritoryIndex].troops += req.fortifyTroops;
     rooms[roomIndex].state = 'draft';
     rooms[roomIndex].attackRecorded = false;
     rooms[roomIndex].currentPlayerIndex = (rooms[roomIndex].currentPlayerIndex + 1) % playerLimit;

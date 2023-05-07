@@ -5,7 +5,7 @@ Client to Server
     draft-request
     {
         roomCode: string,
-        draftRequests: {id: int, troops: int}[]
+        draftRequest: {id: int, troops: int}
     }
 
     card-redeem-request
@@ -42,6 +42,7 @@ Client to Server
 
     fortify-request
     {
+        //fromID && toID == -1 means no fortification
         roomCode:string,
         fromID: int,
         toID: int,
@@ -110,7 +111,16 @@ Server to Client
     attack-response
     {
         success: boolean,
-        {reason: string}
+        {reason: string},
+        {
+        defeat: boolean,
+        attackerID: int,
+        defenderID: int,
+        attackerTroops: int,
+        defenderTroops: int,
+        attackerDice: int[],
+        defenderDice: int[],
+        }
     }
 
     finish-attack-response
