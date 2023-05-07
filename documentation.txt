@@ -1,158 +1,158 @@
 Client to Server
-join-waiting-area-request
-{}
+    join-waiting-area-request
+    {}
 
-draft-request
-{
-    roomCode: string,
-    draftRequests: {id: int, troops: int}[]
-}
+    draft-request
+    {
+        roomCode: string,
+        draftRequests: {id: int, troops: int}[]
+    }
 
-card-redeem-request
-{
-    roomCode: string,
-    cardSetType: string('Infantry', 'Cavalry', 'Artillery', 'All')
-}
+    card-redeem-request
+    {
+        roomCode: string,
+        cardSetType: string('Infantry', 'Cavalry', 'Artillery', 'All')
+    }
 
-finish-draft-request
-{
-    roomCode: string
-}
+    finish-draft-request
+    {
+        roomCode: string
+    }
 
-attack-request
-{
-      roomCode: string,
-      attackerID: int,
-      defenderID: int
-}
+    attack-request
+    {
+        roomCode: string,
+        attackerID: int,
+        defenderID: int
+    }
 
-post-attack-fortify-request
-{
-      roomCode: string,
-      attackerID: int,
-      defenderID: int,
-      attackerTroops: int,
-      defenderTroops: int
-}
+    post-attack-fortify-request
+    {
+        roomCode: string,
+        attackerID: int,
+        defenderID: int,
+        attackerTroops: int,
+        defenderTroops: int
+    }
 
-finish-attack-request
-{
-    roomCode: string
-}
+    finish-attack-request
+    {
+        roomCode: string
+    }
 
-fortify-request
-{
-    roomCode:string,
-    fromID: int,
-    toID: int,
-    fortifyTroops: int
-}
+    fortify-request
+    {
+        roomCode:string,
+        fromID: int,
+        toID: int,
+        fortifyTroops: int
+    }
 
 Server to Client
-game-start-notification
-{
-    players: user object[],
-    roomCode: string,
-    currentPlayerIndex: int,
-    board: board object,
-    state: string ('draft', 'attack', 'post-attack-fortify', 'fortify')
-}
-join-waiting-area-response
-{
-    success: boolean,
-    {reason: string}
-}
+    game-start-notification
+    {
+        players: user object[],
+        roomCode: string,
+        currentPlayerIndex: int,
+        board: board object,
+        state: string ('draft', 'attack', 'post-attack-fortify', 'fortify')
+    }
+    join-waiting-area-response
+    {
+        success: boolean,
+        {reason: string}
+    }
 
-draft-notification
-draft-response
-{
-    success: boolean,
-    {reason: string}
-}
+    draft-notification
+    draft-response
+    {
+        success: boolean,
+        {reason: string}
+    }
 
-card-redeem-response
-{
-    success: boolean,
-    {reason: string}
-}
+    card-redeem-response
+    {
+        success: boolean,
+        {reason: string}
+    }
 
-finish-draft-response
-{
-    success: boolean,
-    {reason: string}
-}
+    finish-draft-response
+    {
+        success: boolean,
+        {reason: string}
+    }
 
-map-update-notification
-{
-    players: user object[],
-    roomCode: string,
-    currentPlayerIndex: int,
-    board: board object,
-    state: string ('draft', 'attack', 'post-attack-fortify', 'fortify')
-}
+    map-update-notification
+    {
+        players: user object[],
+        roomCode: string,
+        currentPlayerIndex: int,
+        board: board object,
+        state: string ('draft', 'attack', 'post-attack-fortify', 'fortify')
+    }
 
-post-attack-fortify-response
-{
-    success: boolean,
-    {reason: string}
-}
+    post-attack-fortify-response
+    {
+        success: boolean,
+        {reason: string}
+    }
 
-post-attack-result-notification
-{
-    players: user object[],
-    roomCode: string,
-    currentPlayerIndex: int,
-    board: board object,
-    state: string ('draft', 'attack', 'post-attack-fortify', 'fortify'),
-    draftTroops: int,
-}
+    post-attack-result-notification
+    {
+        players: user object[],
+        roomCode: string,
+        currentPlayerIndex: int,
+        board: board object,
+        state: string ('draft', 'attack', 'post-attack-fortify', 'fortify'),
+        draftTroops: int,
+    }
 
-attack-response
-{
-    success: boolean,
-    {reason: string}
-}
+    attack-response
+    {
+        success: boolean,
+        {reason: string}
+    }
 
-finish-attack-response
-{
-    success: boolean,
-    {reason: string}
-}
+    finish-attack-response
+    {
+        success: boolean,
+        {reason: string}
+    }
 
-fortify-response
-{
-    success: boolean,
-    {reason: string}
-}
+    fortify-response
+    {
+        success: boolean,
+        {reason: string}
+    }
 
-update-cards-notification
-{
-    cards: string[],
-}
+    update-cards-notification
+    {
+        cards: string[],
+    }
 
-end-game-notification
-{
-    players: user object[],
-    roomCode: string,
-    winner: int,
-    board: board object,
-    state: string ('draft', 'attack', 'post-attack-fortify', 'fortify'),
-}
+    end-game-notification
+    {
+        players: user object[],
+        roomCode: string,
+        winner: int,
+        board: board object,
+        state: string ('draft', 'attack', 'post-attack-fortify', 'fortify'),
+    }
 
 Objects
-board
-{
-    territories: {
-        id: int,
-        neighbours: int[],
-        owner:int,
-        troops: int,
-    }[],
-    continents: {
-        name: string,
-        territories: int[],
-        bonus: int,
-    }[]
-}
+    board
+    {
+        territories: {
+            id: int,
+            neighbours: int[],
+            owner:int,
+            troops: int,
+        }[],
+        continents: {
+            name: string,
+            territories: int[],
+            bonus: int,
+        }[]
+    }
 
 

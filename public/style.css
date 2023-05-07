@@ -1,5 +1,21 @@
-@import url("https://fonts.googleapis.com/css2?family=Abel&display=swap");
 :root {
+    --player1-color-zone: #e93423;
+    --player1-color-background: #d55049;
+    --player1-color-outline: #802f2e;
+
+    --player2-color-zone: #557c47;
+    --player2-color-background: #add773;
+    --player2-color-outline: #628146;
+
+    --popup-background-color-transparent: rgba(0, 0, 0, 0.5);
+    --notification-background-color-transparent: rgba(255, 255, 255, 0.8);
+
+    --cancel-color-background: #d55049;
+    --cancel-color-outline: #802f2e;
+
+    --confirm-color-background: #add773;
+    --confirm-color-outline: #628146;
+
     --material-icons-color: black;
     --field-color: gray;
     --field-background: white;
@@ -27,20 +43,392 @@
     --button-background: #f2855d;
     --button-background-hover: #f8b58b;
 }
+
 * {
-    font-family: "Abel", sans-serif;
-    color: var(--font-color);
+    font-family: "Cairo", sans-serif;
+    color: #000;
     box-sizing: border-box;
 }
 
-/* Basic */
 body {
     min-width: 600px;
     min-height: 300px;
     height: 100vh;
     padding: 0;
     margin: 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: black;
 }
+
+svg#play_area {
+    height: 100vh;
+    width: auto;
+}
+
+text {
+    fill: #fff;
+    font-weight: 800;
+    stroke-width: 5;
+    stroke: #000;
+    paint-order: stroke;
+    text-anchor: middle;
+    font-size: 24px;
+}
+
+g#areas path {
+    stroke-width: 5px;
+    stroke: #000;
+}
+
+g#sea-routes path {
+    stroke-width: 3px;
+    stroke: #000;
+    fill: none;
+}
+
+g#areas, g#text-backgrounds, g#texts {
+    cursor: pointer;
+}
+
+ellipse {
+    stroke-width: 3px;
+    stroke: #000;
+}
+
+#info-panel {
+    position: absolute;
+    bottom: 0px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--popup-background-color-transparent);
+    width: 640px;
+    height: 240px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 64px;
+    padding-right: 64px;
+
+    border-top-right-radius: 64px;
+    border-top-left-radius: 64px;
+}
+
+.text-display {
+    width: 64px;
+    height: 64px;
+    border-radius: 32px;
+    border: solid 3px var(--player1-color-outline);
+    font-size: 32px;
+    background-color: var(--player1-color-background);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.text-display svg {
+    width: 100%;
+    height: 100%;
+}
+
+.text-display text {
+    text-anchor: middle;
+    stroke-width: 5px;
+    stroke: var(--player1-color-outline);
+}
+
+.text-display.enemy {
+    border-color: var(--player2-color-outline);
+    background-color: var(--player2-color-background);
+}
+
+.text-display.enemy text {
+    stroke: var(--player2-color-outline);
+}
+
+.no-backdrop {
+    background-color: transparent;
+    border: none;
+}
+
+.no-backdrop text {
+    stroke: #000;
+}
+
+#turn-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+}
+
+#phase-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+}
+
+#phase-text-wrapper {
+    width: 360px;
+    height: 64px;
+}
+
+.phase-square {
+    width: 96px;
+    height: 16px;
+    background: #fff;
+    border-radius: 8px;
+    border: solid 3px black;
+}
+
+.phase-square.activeSelf {
+    background-color: var(--player1-color-background);
+    border-color: var(--player1-color-outline);
+}
+
+.phase-square.activeEnemy {
+    background-color: var(--player2-color-background);
+    border-color: var(--player2-color-outline);
+}
+
+#next-phase-button {
+    width: 240px;
+    height: 64px;
+}
+
+#popup-troops-selector {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 480px;
+    height: 96px;
+    border-radius: 48px;
+    background-color: var(--popup-background-color-transparent);
+    /* border: solid 5px #000; */
+    position: absolute;
+    left: 50%;
+    top: 75%;
+    transform: translate(-50%, -50%);
+}
+
+.troop-button {
+    width: 96px;
+    height: 96px;
+    border-radius: 48px;
+    border: solid 3px black;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+}
+
+.troop-button:hover {
+    filter:brightness(1.1);
+}
+
+.troop-button:active {
+    filter:brightness(0.9);
+}
+
+.troop-button.small {
+    width: 48px;
+    height: 48px;
+    border-radius: 24px;
+    border-width: 2px;
+}
+
+.troop-button.self {
+    background-color: var(--player1-color-background);
+    border-color: var(--player1-color-outline);
+}
+
+.troop-button.self text {
+    stroke: var(--player1-color-outline);
+}
+
+.troop-button.enemy {
+    background-color: var(--player2-color-background);
+    border-color: var(--player2-color-outline);
+}
+
+.troop-button.enemy text {
+    stroke: var(--player2-color-outline);
+}
+
+#troops-cancel-button {
+    background-color: var(--cancel-color-background);
+    border-color: var(--cancel-color-outline);
+}
+
+#troops-confirm-button {
+    background-color: var(--confirm-color-background);
+    border-color: var(--confirm-color-outline);
+}
+
+#troops-decrease-button {
+    background-color: var(--cancel-color-background);
+    border-color: var(--cancel-color-outline);
+}
+
+#troops-increase-button {
+    background-color: var(--confirm-color-background);
+    border-color: var(--confirm-color-outline);
+}
+
+.troops-button .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 800, 'GRAD' 200, 'opsz' 48;
+    /* color: white; */
+}
+
+#troops-text-wrapper {
+    height: 96px;
+    width: 96px;
+}
+
+#notification {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--notification-background-color-transparent);
+    width: 480px;
+    height: 48px;
+    border-bottom-left-radius: 24px;
+    border-bottom-right-radius: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#battle-screen {
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    backdrop-filter: blur(3px);
+    background-color: var(--popup-background-color-transparent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+
+}
+
+#self-troops-wrapper {
+    position: absolute;
+    left: 10%;
+    top: 20%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#enemy-troops-wrapper {
+    position: absolute;
+    right: 10%;
+    top: 20%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#self-dice-wrapper {
+    left: 40%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#enemy-dice-wrapper {
+    right: 40%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dice-wrapper {
+    position: absolute;
+    top: 20%;
+}
+
+#self-dice-1, #enemy-dice-1 {
+    top: 0;
+}
+
+#self-dice-2, #enemy-dice-2 {
+    top: 10vh;
+}
+
+#self-dice-3 {
+    top: 20vh;
+}
+
+.dice {
+    position: absolute;
+    width: 8vh;
+    height: 8vh;
+}
+
+.dice ellipse {
+    stroke: none;
+}
+
+#battle-buttons-wrapper {
+    position: absolute;
+    bottom: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--notification-background-color-transparent);
+    width: 360px;
+    height: 180px;
+    border-radius: 90px;
+}
+
+#close-battle-button {
+    position: absolute;
+    top: 4vh;
+    right: 4vh;
+}
+
+#self-troops-title-wrapper {
+    width: 20vw;
+}
+
+#self-troops-text-wrapper {
+    /* width: 5vw; */
+}
+
+#enemy-troops-title-wrapper {
+    width: 20vw;
+}
+
+#enemy-troops-text-wrapper {
+    /* width: 5vw; */
+}
+
+#quit-button {
+    position: absolute;
+    right: 20vh;
+    top: 5vh;
+}
+
+/*       */
+/* Login */
+/*       */
+
 .center { text-align: center; }
 .shadow { box-shadow: 0px 0px 10px rgb(0, 0, 0, 0.4); }
 
@@ -132,7 +520,6 @@ button.icon:hover {
 button.icon:active {
     margin: 2px -2px -2px 2px;
 }
-
 /* Data field caption and content */
 .field-content {
     border-radius: 50px;
