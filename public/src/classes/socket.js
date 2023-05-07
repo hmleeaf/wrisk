@@ -34,10 +34,17 @@ const Socket = (function () {
         socket.on('draft-notification', (res) => {
             console.log('draft-notification', res);
             if (
+                // enters SelfDraft from Enemy via enemy ends turn
                 GameStateMachine.state === 'Enemy' ||
+                // enters SelfDraft from SelfDraftSelected via draft success
                 GameStateMachine.state === 'SelfDraftSelected'
             ) {
                 GameStateMachine.transition('next', res.draftTroops);
+            } else if (
+                // enters SelfDraft from SelfDraft via redeem card success
+                GameStateMachine.state === 'SelfDraft'
+            ) {
+                GameStateMachine.transition('card', res.draftTroops);
             }
         });
 
@@ -118,6 +125,7 @@ const Socket = (function () {
 
         socket.on('update-cards-notification', (res) => {
             console.log('update-cards-notification', res);
+            Cards.updateCards(res.cards);
         });
 
         socket.on('end-game-notification', (res) => {
@@ -191,6 +199,13 @@ const Socket = (function () {
         });
     };
 
+    const requestCardTrade = (cardSetType) => {
+        socket.emit('card-redeem-request', {
+            roomCode,
+            cardSetType,
+        });
+    };
+
     return {
         getSocket,
         connect,
@@ -202,5 +217,6 @@ const Socket = (function () {
         requestAttack,
         requestAttackFortify,
         requestFortify,
+        requestCardTrade,
     };
 })();

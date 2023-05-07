@@ -516,4 +516,6 @@ $(() => {
             SignInForm.show();
         }
     );
+
+    Cards.initialize();
 });

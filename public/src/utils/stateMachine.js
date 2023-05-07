@@ -71,6 +71,14 @@ const STATES = {
                     );
                 },
             },
+            card: {
+                target: 'SelfDraft',
+                action: () => {
+                    console.log(
+                        'transition action for "card" in "SelfDraft" state'
+                    );
+                },
+            },
         },
     },
 

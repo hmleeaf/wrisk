@@ -163,12 +163,12 @@
     </div>
 
     <div id="popup-troops-selector">
-        <button id="troops-cancel-button" class="troop-button">
+        <button id="troops-cancel-button" class="icon-button troop-button cancel">
             <span class="material-symbols-outlined">
                 close
             </span>
         </button>
-        <button id="troops-decrease-button" class="troop-button small">
+        <button id="troops-decrease-button" class="icon-button troop-button small cancel">
             <span class="material-symbols-outlined">
                 remove
             </span>
@@ -180,12 +180,12 @@
                 </text>
             </svg>
         </div>
-        <button id="troops-increase-button" class="troop-button small">
+        <button id="troops-increase-button" class="icon-button troop-button small confirm">
             <span class="material-symbols-outlined">
                 add
             </span>
         </button>
-        <button id="troops-confirm-button" class="troop-button">
+        <button id="troops-confirm-button" class="icon-button troop-button confirm">
             <span class="material-symbols-outlined">
                 done
             </span>
@@ -248,7 +248,31 @@
         <button id="close-battle-button">Close</button>
     </div>
 
-    <button id="quit-button">Quit</button>
+    <button id="quit-button" class="cancel">Quit</button>
+    <button id="open-cards-button">
+        <svg viewBox="0 0 128 128"">
+             <g>
+                <rect transform="rotate(30 66 70)" stroke="#000000" fill="#ffffff" x="34" y="22" width="64" height="96" rx="8" stroke-width="3"/>
+                <rect transform="rotate(30 64 64)" stroke="#000000" fill="#ffffff" x="32" y="16" width="64" height="96" rx="8" stroke-width="3"/>
+                <rect transform="rotate(30 62 58)" stroke="#000000" fill="#ffffff" x="30" y="10" width="64" height="96" rx="8" stroke-width="3"/>
+             </g>
+             <text id="cards-count-text" y="63.25" x="58">0</text>
+           </svg>
+    </button>
+
+    <div id="cards-overlay" class="overlay">
+        <div id="cards-window" class="content shadow">
+            <div id="cards-container">
+            </div>
+            <div id="cards-error" class="error hidden">error</div>
+            <button id="trade-cards-button" class="confirm" disabled>Trade</button>
+        </div>
+        <button id="close-cards-overlay-button" class="icon-button cancel">
+            <span class="material-symbols-outlined">
+                close
+            </span>
+        </button>
+    </div>
 
     <div id="signin-overlay" class="overlay row">
         <div class="content shadow row">
@@ -290,6 +314,7 @@
     <script src="src/classes/authentication.js"></script>
     <script src="src/classes/avatar.js"></script>
     <script src="src/classes/board.js"></script>
+    <script src="src/classes/cards.js"></script>
     <script src="src/classes/game.js"></script>
     <script src="src/classes/registration.js"></script>
     <script src="src/classes/socket.js"></script>
