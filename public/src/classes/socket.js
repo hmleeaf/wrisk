@@ -33,16 +33,39 @@ const Socket = (function () {
             Board.initialize(res.board);
             Game.initialize(res);
             UI.initializeGame(res);
+            if (
+                Authentication.getUser().username !==
+                res.players[res.currentPlayerIndex].user.username
+            ) {
+                Game.setEnemyPhase(res.state);
+                Notification.queueNotification('phase', {
+                    phase: 'draft',
+                    currentPlayerIdx: UI.getCurrentPlayerIdx(),
+                });
+            }
         });
 
         socket.on('draft-notification', (res) => {
             console.log('draft-notification', res);
             if (
                 // enters SelfDraft from Enemy via enemy ends turn
-                GameStateMachine.state === 'Enemy' ||
-                // enters SelfDraft from SelfDraftSelected via draft success
-                GameStateMachine.state === 'SelfDraftSelected'
+                GameStateMachine.state === 'Enemy'
             ) {
+                UI.updateCurrentPlayerIdx(res.currentPlayerIndex);
+                GameStateMachine.transition('next', res.draftTroops);
+                Notification.queueNotification('phase', {
+                    phase: 'draft',
+                    currentPlayerIdx: UI.getCurrentPlayerIdx(),
+                });
+                Notification.queueNotification('troops', {
+                    currentPlayerIdx: UI.getCurrentPlayerIdx(),
+                    troops: res.draftTroops,
+                    occupied: Board.getOccupied(UI.getCurrentPlayerIdx()),
+                    user: res.players[UI.getCurrentPlayerIdx()].user,
+                });
+            }
+            // enters SelfDraft from SelfDraftSelected via draft success
+            else if (GameStateMachine.state === 'SelfDraftSelected') {
                 GameStateMachine.transition('next', res.draftTroops);
             } else if (
                 // enters SelfDraft from SelfDraft via redeem card success
@@ -61,14 +84,19 @@ const Socket = (function () {
             console.log('finish-draft-response', res);
             if (!res.success) handleError(res.reason);
             GameStateMachine.transition('next');
+            Notification.queueNotification('phase', {
+                phase: 'attack',
+                currentPlayerIdx: UI.getCurrentPlayerIdx(),
+            });
         });
 
         socket.on('map-update-notification', (res) => {
-            console.log('map-update-notification', res);
+            console.log('map-update-notification', res, GameStateMachine.state);
             Board.updateBoard(res.board);
             UI.updateBoardText();
             UI.updateBoardTextBackground();
             UI.updateBoardZones();
+            UI.updateCurrentPlayerIdx(res.currentPlayerIndex);
 
             if (GameStateMachine.state === 'Enemy') {
                 UI.updateInfoPanel(
@@ -83,6 +111,25 @@ const Socket = (function () {
                         : undefined,
                     undefined
                 );
+
+                let state = res.state;
+                if (state === 'post-attack-fortify') state = 'attack';
+                if (
+                    Game.getEnemyPhase() !== state
+                    // !(Game.getEnemyPhase() === 'fortify' && state === 'draft')
+                ) {
+                    if (
+                        !(
+                            Game.getEnemyPhase() === 'fortify' &&
+                            state === 'draft'
+                        )
+                    )
+                        Notification.queueNotification('phase', {
+                            phase: state,
+                            currentPlayerIdx: UI.getCurrentPlayerIdx(),
+                        });
+                    Game.setEnemyPhase(res.state);
+                }
             }
         });
 
@@ -102,6 +149,10 @@ const Socket = (function () {
             console.log('finish-attack-response', res);
             if (!res.success) handleError(res.reason);
             GameStateMachine.transition('next');
+            Notification.queueNotification('phase', {
+                phase: 'fortify',
+                currentPlayerIdx: UI.getCurrentPlayerIdx(),
+            });
         });
 
         socket.on('fortify-response', (res) => {

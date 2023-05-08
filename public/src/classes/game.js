@@ -1,4 +1,10 @@
 const Game = (() => {
+    let enemyPhase = 'fortify';
+
+    const setEnemyPhase = (phase) => (enemyPhase = phase);
+
+    const getEnemyPhase = () => enemyPhase;
+
     let originalZoneTroops;
     let originalNewTroops;
     let draftingZoneId;
@@ -365,8 +371,6 @@ const Game = (() => {
         );
         currPlayerIdx = data.currentPlayerIndex;
 
-        console.log(playerIdx);
-
         UI.updateBoardText();
         UI.updateBoardTextBackground();
         UI.updateBoardZones();
@@ -403,5 +407,7 @@ const Game = (() => {
         commitAttackDeploy,
         requestFortifyDeploy,
         commitFortifyDeploy,
+        setEnemyPhase,
+        getEnemyPhase,
     };
 })();

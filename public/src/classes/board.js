@@ -39,6 +39,28 @@ const Board = (() => {
         return connectedZones.filter((z) => z !== zoneId);
     };
 
+    const getOccupied = (owner) => {
+        let continents = 0;
+        board.continents.forEach((cont) => {
+            if (
+                cont.territories.reduce(
+                    (prev, curr) =>
+                        prev && board.territories[curr].owner === owner,
+                    true
+                )
+            ) {
+                continents++;
+            }
+        });
+        let territories = 0;
+        board.territories.forEach((terr) => {
+            if (terr.owner === owner) {
+                territories++;
+            }
+        });
+        return { continents, territories };
+    };
+
     const initialize = (board_) => {
         board = board_;
     };
@@ -58,5 +80,6 @@ const Board = (() => {
         setZoneOwner,
         initialize,
         updateBoard,
+        getOccupied,
     };
 })();
