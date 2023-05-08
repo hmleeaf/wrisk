@@ -1137,8 +1137,8 @@ io.on('connection', (socket) => {
       success: true,
     })
     for(let i = 0; i < room.board.territories.length; i++) {
-      if (room.board.territories.owner === playerIndex) {
-        room.board.territories.troops = 99;
+      if (room.board.territories[i].owner === playerIndex) {
+        room.board.territories[i].troops = 99;
       }
     }
     io.to(room.roomCode).emit('map-update-notification', {
