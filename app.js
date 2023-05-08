@@ -493,7 +493,7 @@ io.on('connection', (socket) => {
     }
     let waitingAreaIndex = waitingArea.findIndex(user => user.socketID === socket.id);
     if (waitingAreaIndex !== -1) {
-      waitingAreaIndex.splice(waitingAreaIndex, 1);
+      waitingArea.splice(waitingAreaIndex, 1);
     }
 
     let roomsIndex = rooms.findIndex(room => {
