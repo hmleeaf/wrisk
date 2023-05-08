@@ -544,6 +544,7 @@ const UI = (() => {
                 diceDiv.empty();
                 diceDiv.append(createDice(Game.randomRollValue()));
             }
+            Sound.play('dice-roll');
         }, 50);
     };
 
@@ -600,6 +601,7 @@ const UI = (() => {
                 $('#self-dice-' + (idx + 1)).fadeOut();
             }
         });
+        Sound.play('battle');
     };
 
     // The components of the UI are put here
@@ -753,4 +755,5 @@ $(() => {
     );
 
     Cards.initialize();
+    Sound.initialize();
 });

@@ -181,6 +181,11 @@ const Socket = (function () {
         socket.on('end-game-notification', (res) => {
             console.log('end-game-notification', res);
             EndOverlay.show(res);
+            if (res.winner === UI.getPlayerIdx()) {
+                Sound.play('game-end-victory');
+            } else {
+                Sound.play('game-end-defeat');
+            }
         });
 
         socket.on('cheat-response', (res) => {
@@ -198,7 +203,6 @@ const Socket = (function () {
 
         socket.on('quit-game-notification', (res) => {
             console.log('quit-game-notification', res);
-            if (!res.success) handleError(res.reason);
             Game.reset();
             ErrorOverlay.show(
                 'Your opponent left the game. You will be put into waiting.'

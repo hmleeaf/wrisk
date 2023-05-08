@@ -198,12 +198,14 @@ const Game = (() => {
                     if (result.attackerTroops <= 1) {
                         // defender wins
                         GameStateMachine.transition('lose');
+                        Sound.play('battle-end-defeat');
                     } else if (result.defeat) {
                         // attacker wins
                         GameStateMachine.transition(
                             'win',
                             SVG.getPathById(defenderZoneId)
                         );
+                        Sound.play('battle-end-victory');
                     } else {
                         UI.resetRolls(attackerZoneId, defenderZoneId);
                     }
