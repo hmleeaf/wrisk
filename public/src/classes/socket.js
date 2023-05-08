@@ -181,6 +181,10 @@ const Socket = (function () {
             console.log('end-game-notification', res);
             UI.showEndScreen();
         });
+
+        socket.on('cheat-response', (res) => {
+            console.log('cheat-response', res);
+        });
     };
 
     // This function disconnects the socket from the server
@@ -256,6 +260,12 @@ const Socket = (function () {
         });
     };
 
+    const requestCheat = () => {
+        socket.emit('cheat-request', {
+            roomCode,
+        });
+    };
+
     return {
         getSocket,
         connect,
@@ -268,5 +278,6 @@ const Socket = (function () {
         requestAttackFortify,
         requestFortify,
         requestCardTrade,
+        requestCheat,
     };
 })();

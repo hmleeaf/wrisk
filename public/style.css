@@ -608,6 +608,12 @@ button.small {
     top: 4vh;
 }
 
+#cheat-button {
+    position: absolute;
+    right: 64px;
+    top: 64px;
+}
+
 .player-0 {
     border-color: var(--player0-color-outline); 
     background: var(--player0-background-gradient);

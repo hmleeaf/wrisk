@@ -635,6 +635,9 @@ $(() => {
             Socket.disconnect();
         });
     });
+    $('#cheat-button').on('click', () => {
+        Socket.requestCheat();
+    });
 
     // Initialize the UI
     UI.initialize();
