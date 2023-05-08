@@ -132,6 +132,15 @@ const Cards = (() => {
     };
 
     const updateCards = (cards_) => {
+        if (cards_.length === cards.length + 1) {
+            let newCards = cards_.map((card) => card);
+            cards.forEach((oldCard) => {
+                const i = newCards.findIndex(oldCard);
+                newCards = newCards.filter((_, idx) => idx !== i);
+            });
+            Notification.queueNotification('card', { card: newCards[0] });
+        }
+
         // update local cards state
         cards = cards_;
 

@@ -98,7 +98,7 @@ const WaitingOverlay = (() => {
 const UI = (() => {
     // set up default behaviors for HTML elements
     $('#popup-troops-selector').hide();
-    $('#notification').hide();
+    $('#hint').hide();
     $('#battle-screen').hide();
     $('#close-battle-button').on('click', () => {
         $('#battle-screen').hide();
@@ -351,14 +351,14 @@ const UI = (() => {
         $('#info-panel').hide();
     };
 
-    const showNotification = (text) => {
-        $('#notification').show();
-        $('#notification').text(text);
+    const showHint = (text) => {
+        $('#hint').show();
+        $('#hint').text(text);
     };
 
-    const hideNotification = () => {
-        $('#notification').hide();
-        $('#notification').text('');
+    const hideHint = () => {
+        $('#hint').hide();
+        $('#hint').text('');
     };
 
     const updateBattleScreenTroops = (attackerZoneId, defenderZoneId) => {
@@ -479,7 +479,7 @@ const UI = (() => {
     };
 
     // The components of the UI are put here
-    const components = [SignInForm];
+    const components = [SignInForm, Notification];
 
     // This function initializes the UI
     const initialize = function () {
@@ -493,16 +493,23 @@ const UI = (() => {
             $('#dice-spinner-wrapper').append(
                 DICE_SVG_STRING[Math.floor(Math.random() * 6 + 1)]
             );
-        }, 2000);
+        }, 5000);
     };
 
+    let currentPlayerIdx;
     let playerIdx;
+    let players;
+
+    const getCurrentPlayerIdx = () => currentPlayerIdx;
+    const updateCurrentPlayerIdx = (i) => (currentPlayerIdx = i);
 
     const initializeGame = (data) => {
         playerIdx = data.players.findIndex(
             (player) =>
                 player.user.username === Authentication.getUser().username
         );
+        players = data.players;
+        currentPlayerIdx = data.currentPlayerIndex;
         $('#deployable-troops').addClass('player-' + data.currentPlayerIndex);
         $('#self-troops-text-wrapper').addClass('player-' + playerIdx);
         $('#enemy-troops-text-wrapper').addClass(
@@ -521,6 +528,17 @@ const UI = (() => {
                 : undefined,
             undefined
         );
+
+        Notification.queueNotification('introduction', {
+            playerIdx,
+            user: data.players[playerIdx].user,
+        });
+
+        // if (playerIdx !== currentPlayerIdx)
+        //     Notification.queueNotification('phase', {
+        //         phase: 'draft',
+        //         currentPlayerIdx,
+        //     });
     };
 
     return {
@@ -536,8 +554,8 @@ const UI = (() => {
         updateBoardTextBackground,
         updateBoardText,
         updateBoardZones,
-        showNotification,
-        hideNotification,
+        showHint,
+        hideHint,
         showBattleScreen,
         hideBattleScreen,
         updateRolls,
@@ -554,6 +572,8 @@ const UI = (() => {
         initializeGame,
         showEndScreen,
         hideEndScreen,
+        getCurrentPlayerIdx,
+        updateCurrentPlayerIdx,
     };
 })();
 

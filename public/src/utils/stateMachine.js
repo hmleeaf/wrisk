@@ -38,13 +38,13 @@ const STATES = {
                 console.log('SelfDraft: onEnter');
                 if (troops !== undefined) Game.setDraftTroops(troops);
                 UI.updateInfoPanel(true, PHASES.DRAFT, troops);
-                UI.showNotification(
+                UI.showHint(
                     'Tap any of your territories to begin deploying troops'
                 );
             },
             onExit: () => {
                 console.log('SelfDraft: onExit');
-                UI.hideNotification();
+                UI.hideHint();
             },
         },
         data: {
@@ -140,13 +140,11 @@ const STATES = {
             onEnter: () => {
                 console.log('SelfAttack: onEnter');
                 UI.updateInfoPanel(true, PHASES.ATTACK);
-                UI.showNotification(
-                    'Select a territory to begin your attack from'
-                );
+                UI.showHint('Select a territory to begin your attack from');
             },
             onExit: () => {
                 console.log('SelfAttack: onExit');
-                UI.hideNotification();
+                UI.hideHint();
             },
         },
         data: {
@@ -180,12 +178,12 @@ const STATES = {
         actions: {
             onEnter: (path) => {
                 console.log('SelfAttackSelected: onEnter');
-                UI.showNotification('Select an adjacent territory to attack');
+                UI.showHint('Select an adjacent territory to attack');
                 Game.beginAttack(path);
             },
             onExit: () => {
                 console.log('SelfAttackSelected: onExit');
-                UI.hideNotification();
+                UI.hideHint();
             },
         },
         data: {
@@ -292,7 +290,7 @@ const STATES = {
             },
             onExit: () => {
                 console.log('SelfAttackDeploy: onExit');
-                UI.hideNotification();
+                UI.hideHint();
             },
         },
         data: {
@@ -315,13 +313,11 @@ const STATES = {
             onEnter: () => {
                 console.log('SelfFortify: onEnter');
                 UI.updateInfoPanel(true, PHASES.FORTIFY);
-                UI.showNotification(
-                    'Select a territory to move your troops from'
-                );
+                UI.showHint('Select a territory to move your troops from');
             },
             onExit: () => {
                 console.log('SelfFortify: onExit');
-                UI.hideNotification();
+                UI.hideHint();
             },
         },
         data: {
@@ -356,14 +352,14 @@ const STATES = {
             onEnter: (path) => {
                 console.log('SelfFortifySelected: onEnter');
                 Game.beginFortify(path);
-                UI.showNotification(
+                UI.showHint(
                     'Select an adjacent territory to move your troops to'
                 );
             },
             onExit: () => {
                 console.log('SelfFortifySelected: onExit');
                 Game.cancelFortify();
-                UI.hideNotification();
+                UI.hideHint();
             },
         },
         data: {
@@ -371,7 +367,7 @@ const STATES = {
                 const path = SVG.getSvgPathByEvent(e);
                 if (path && Game.checkZoneCanFortifyTo(path))
                     GameStateMachine.transition('select', path);
-                else if (path && checkZoneCanFortifyFrom(path))
+                else if (path && Game.checkZoneCanFortifyFrom(path))
                     GameStateMachine.transition('change', path);
                 else GameStateMachine.transition('back');
             },
@@ -423,7 +419,12 @@ const STATES = {
             },
         },
         data: {
-            zoneOnClick: (e) => {},
+            zoneOnClick: (e) => {
+                const path = SVG.getSvgPathByEvent(e);
+                if (path && Game.checkZoneCanFortifyTo(path))
+                    GameStateMachine.transition('change', path);
+                else GameStateMachine.transition('back');
+            },
         },
         transitions: {
             back: {
@@ -449,6 +450,15 @@ const STATES = {
                     console.log(
                         'transition action for "select" in "SelfFortifyDeploy" state'
                     );
+                },
+            },
+            change: {
+                target: 'SelfFortifyDeploy',
+                action: () => {
+                    console.log(
+                        'transition action for "select" in "SelfFortifyDeploy" state'
+                    );
+                    Game.cancelFortifyDeploy();
                 },
             },
         },
