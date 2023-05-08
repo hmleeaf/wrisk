@@ -524,9 +524,19 @@ io.on('connection', (socket) => {
     waitingArea.push({user, socketID: socket.id});
     console.log(`User ${socket.id} has joined the waiting area.`)
     if (waitingArea.length >= playerLimit) {
-      let players = waitingArea.splice(0, playerLimit).map(player => {
-        return {...player, cards: [], troopsLost: 0, troopsKill: 0}
+      let board = initializeBoard(maps[0]);
+      let players = waitingArea.splice(0, playerLimit).map((player, idx) => {
+        return {
+          ...player,
+          cards: [],
+          troopsLost: 0,
+          troopsKill: 0,
+          troopsReceived: board.territories.filter(territory => territory.owner === idx)
+              .map(territory => territory.troops)
+              .reduce((accumulator, currentValue) => accumulator + currentValue, 0)
+        }
       });
+      console.log(JSON.stringify(players));
       const roomCode = generateRandomRoomCode();
       for (const player of players) {
         io.sockets.sockets.get(player.socketID).join(roomCode);
@@ -537,8 +547,8 @@ io.on('connection', (socket) => {
       rooms.push({
         players,
         roomCode,
+        board,
         currentPlayerIndex: 0,
-        board: initializeBoard(maps[0]),
         state: 'draft',
         attackRecorded: false,
         beginTime: new Date(),
@@ -546,6 +556,8 @@ io.on('connection', (socket) => {
       })
       const room = rooms[getRoomIndexByRoomCode(roomCode)];
       room.draftTroops = calculateDraftTroops(room.board, room.currentPlayerIndex)
+      room.players[room.currentPlayerIndex].troopsReceived += room.draftTroops;
+
       io.to(roomCode).emit('game-start-notification', {
         players: removeKeyFromArray(room.players, 'cards'),
         roomCode: room.roomCode,
@@ -675,6 +687,7 @@ io.on('connection', (socket) => {
     }
     room.players[room.currentPlayerIndex].cards = redeemResult;
     room.draftTroops += cardSets[req.cardSetType].bonus;
+    room.players[room.currentPlayerIndex].troopsReceived += cardSets[req.cardSetType].bonus;
     socket.emit('card-redeem-response', {
       success: true
     })
@@ -1002,6 +1015,7 @@ io.on('connection', (socket) => {
       rooms[roomIndex].round += 1;
     }
     rooms[roomIndex].draftTroops = calculateDraftTroops(room.board, room.currentPlayerIndex);
+    rooms[roomIndex].players[room.currentPlayerIndex].troopsReceived += room.draftTroops;
     socket.emit('fortify-response', {
       success: true,
     })
