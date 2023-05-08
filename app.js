@@ -378,11 +378,16 @@ function riskAttack(attackerTroops, defenderTroops) {
   const attackerDice = rollDice(Math.min(attackerTroops - 1, 3));
   const defenderDice = rollDice(Math.min(defenderTroops, 2));
 
+  let attackerTroopsLost = 0;
+  let defenderTroopLost = 0;
+
   for (let i = 0; i < Math.min(attackerDice.length, defenderDice.length); i++) {
     if (attackerDice[i] > defenderDice[i]) {
       defenderTroops--;
+      defenderTroopLost++;
     } else {
       attackerTroops--;
+      attackerTroopsLost++
     }
   }
 
@@ -392,6 +397,8 @@ function riskAttack(attackerTroops, defenderTroops) {
     defenderTroops,
     attackerDice,
     defenderDice,
+    attackerTroopsLost,
+    defenderTroopLost
   };
 }
 
@@ -484,6 +491,19 @@ io.on('connection', (socket) => {
       delete onlineUsers[user.username];
       io.emit('remove user', JSON.stringify(user));
     }
+    let waitingAreaIndex = waitingArea.findIndex(user => user.socketID === socket.id);
+    if (waitingAreaIndex !== -1) {
+      waitingAreaIndex.splice(waitingAreaIndex, 1);
+    }
+
+    let roomsIndex = rooms.findIndex(room => {
+      room.players.map(player => player.socketID).includes(socket.id);
+    })
+    if (roomsIndex !== -1) {
+      socket.to(rooms[roomsIndex].roomCode).emit('quit-game-notification', {})
+      console.log(`Room ${rooms[roomsIndex].roomCode} is removed.`)
+      rooms.splice(roomsIndex, 1);
+    }
   });
 
   socket.on('get users', () => {
@@ -505,7 +525,7 @@ io.on('connection', (socket) => {
     console.log(`User ${socket.id} has joined the waiting area.`)
     if (waitingArea.length >= playerLimit) {
       let players = waitingArea.splice(0, playerLimit).map(player => {
-        return {...player, cards: []}
+        return {...player, cards: [], troopsLost: 0, troopsKill: 0}
       });
       const roomCode = generateRandomRoomCode();
       for (const player of players) {
@@ -521,6 +541,8 @@ io.on('connection', (socket) => {
         board: initializeBoard(maps[0]),
         state: 'draft',
         attackRecorded: false,
+        beginTime: new Date(),
+        round: 1,
       })
       const room = rooms[getRoomIndexByRoomCode(roomCode)];
       room.draftTroops = calculateDraftTroops(room.board, room.currentPlayerIndex)
@@ -751,6 +773,12 @@ io.on('connection', (socket) => {
       return;
     }
     const result = riskAttack(attackerTerritory.troops, defenderTerritory.troops)
+    rooms[roomIndex].players[attackerTerritory.owner].troopsLost += result.attackerTroopsLost;
+    rooms[roomIndex].players[attackerTerritory.owner].troopsKill += result.defenderTroopLost;
+
+    rooms[roomIndex].players[defenderTerritory.owner].troopsLost += result.defenderTroopLost;
+    rooms[roomIndex].players[defenderTerritory.owner].troopsKill += result.attackerTroopsLost;
+
     rooms[roomIndex].board.territories[attackerTerritoryIndex].troops = result.attackerTroops;
     rooms[roomIndex].board.territories[defenderTerritoryIndex].troops = result.defenderTroops;
 
@@ -854,8 +882,11 @@ io.on('connection', (socket) => {
         roomCode: room.roomCode,
         winner: room.currentPlayerIndex,
         board: room.board,
-        state: 'end',
+        state: room.state,
+        round: room.round,
+        duration: new Date() - room.beginTime,
       })
+      rooms.splice(roomIndex, 1);
       return;
     }
 
@@ -967,6 +998,9 @@ io.on('connection', (socket) => {
     rooms[roomIndex].state = 'draft';
     rooms[roomIndex].attackRecorded = false;
     rooms[roomIndex].currentPlayerIndex = (rooms[roomIndex].currentPlayerIndex + 1) % playerLimit;
+    if (rooms[roomIndex].currentPlayerIndex === 0) {
+      rooms[roomIndex].round += 1;
+    }
     rooms[roomIndex].draftTroops = calculateDraftTroops(room.board, room.currentPlayerIndex);
     socket.emit('fortify-response', {
       success: true,
