@@ -487,22 +487,32 @@ io.on('connection', (socket) => {
 
   // delete user on disconnect
   socket.on('disconnect', () => {
+    console.log(`${socket.id} has disconnected.`)
     if (user) {
       delete onlineUsers[user.username];
       io.emit('remove user', JSON.stringify(user));
     }
     let waitingAreaIndex = waitingArea.findIndex(user => user.socketID === socket.id);
     if (waitingAreaIndex !== -1) {
+      console.log(`remove ${socket.id} from waiting area.`)
       waitingArea.splice(waitingAreaIndex, 1);
     }
+    console.log(socket.id);
+    let roomIndex = -1;
 
-    let roomsIndex = rooms.findIndex(room => {
-      room.players.map(player => player.socketID).includes(socket.id);
-    })
-    if (roomsIndex !== -1) {
-      socket.to(rooms[roomsIndex].roomCode).emit('quit-game-notification', {})
-      console.log(`Room ${rooms[roomsIndex].roomCode} is removed.`)
-      rooms.splice(roomsIndex, 1);
+
+    for (let i = 0; i < rooms.length; i++) {
+      if (rooms[i].players.map(player => player.socketID).includes(socket.id)) {
+        roomIndex = i;
+        break;
+      }
+    }
+
+    console.log(roomIndex);
+    if (roomIndex !== -1) {
+      socket.to(rooms[roomIndex].roomCode).emit('quit-game-notification', {})
+      console.log(`Room ${rooms[roomIndex].roomCode} is removed.`)
+      rooms.splice(roomIndex, 1);
     }
   });
 

@@ -13,5 +13,10 @@
   "avatar": "Hamster",
   "name": "test",
   "password": "$2b$10$gDNyXeF7Wdc12m5jBUWmeOwDKBAydNymgy6DHyZyPQ9jWwlm3oVyy"
+ },
+ "hey": {
+  "avatar": "Hamster",
+  "name": "hey",
+  "password": "$2b$10$.LNTOoN4NswYglMqdtwoT.WOVLClMvuUJ1VOykquK27wpX4QCUdKO"
  }
 }
