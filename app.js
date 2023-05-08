@@ -200,7 +200,7 @@ const maps = [{
   continents: [
     {name: 'asia', territories: [13, 14, 15, 16], bonus: 4},
     {name: 'australia', territories: [17, 18], bonus: 2},
-    {name: 'europe', territories: [7, 8, 9], bonus: 3},
+    {name: 'europe', territories: [6, 7, 8, 9], bonus: 3},
     {name: 'africa', territories: [10, 11, 12], bonus: 3},
     {name: 'north america', territories: [0, 1, 2], bonus: 3},
     {name: 'south america', territories: [3, 4, 5], bonus: 2}
@@ -531,6 +531,7 @@ io.on('connection', (socket) => {
           cards: [],
           troopsLost: 0,
           troopsKill: 0,
+          replayRequest: false,
           troopsReceived: board.territories.filter(territory => territory.owner === idx)
               .map(territory => territory.troops)
               .reduce((accumulator, currentValue) => accumulator + currentValue, 0)
@@ -899,7 +900,7 @@ io.on('connection', (socket) => {
         round: room.round,
         duration: new Date() - room.beginTime,
       })
-      rooms.splice(roomIndex, 1);
+      // rooms.splice(roomIndex, 1);
       return;
     }
 
@@ -915,6 +916,83 @@ io.on('connection', (socket) => {
 
 
   })
+
+  socket.on('replay-request', req => {
+    let roomIndex = getRoomIndexByRoomCode(req.roomCode);
+    if (roomIndex === -1) {
+      socket.emit('replay-response', {
+        success: false,
+        reason: 'RoomCode not found.'
+      })
+      return;
+    }
+    const room = rooms[roomIndex];
+    if (room.state !== 'end') {
+      socket.emit('replay-response', {
+        success: false,
+      })
+      return;
+    }
+    let player = room.players.find(player => player.socketID === socket.id);
+    player.replayRequest = true;
+    let restart = true;
+    for (const player of room.players) {
+      if (!player.replayRequest)
+        restart = false;
+    }
+
+    if (restart) {
+      socket.emit('replay-response', {
+        success: true,
+        waiting: true,
+      })
+
+      let board = initializeBoard(maps[0]);
+      for (let i = 0; i < room.players.length; i++) {
+        let player = room.players[i];
+        player.cards = [];
+        player.troopsLost = 0;
+        player.troopsKill = 0;
+        player.replayRequest = false;
+        player.troopsReceived = board.territories.filter(territory => territory.owner === i)
+            .map(territory => territory.troops)
+            .reduce((accumulator, currentValue) => accumulator + currentValue, 0)
+      }
+
+      room.board = board;
+      room.currentPlayerIndex = 0;
+      room.state = 'draft';
+      room.attackRecorded = false;
+      room.beginTime = new Date();
+      room.round = 1;
+      room.draftTroops = calculateDraftTroops(room.board, room.currentPlayerIndex)
+
+      room.players[room.currentPlayerIndex].troopsReceived += room.draftTroops;
+
+      io.to(room.roomCode).emit('game-start-notification', {
+        players: removeKeyFromArray(room.players, 'cards'),
+        roomCode: room.roomCode,
+        currentPlayerIndex: room.currentPlayerIndex,
+        board: room.board,
+        state: room.state,
+      })
+
+      io.to(room.players[room.currentPlayerIndex].socketID).emit('draft-notification', {
+        players: removeKeyFromArray(room.players, 'cards'),
+        roomCode: room.roomCode,
+        currentPlayerIndex: room.currentPlayerIndex,
+        board: room.board,
+        state: room.state,
+        draftTroops: room.draftTroops
+      })
+    } else {
+      socket.emit('replay-response', {
+        success: true,
+        waiting: true,
+      })
+    }
+  })
+
   socket.on('finish-attack-request', req => {
     let roomIndex = getRoomIndexByRoomCode(req.roomCode);
     if (roomIndex === -1) {
