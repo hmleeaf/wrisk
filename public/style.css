@@ -578,6 +578,7 @@ button.small {
     width: 360px;
     height: 180px;
     border-radius: 90px;
+    gap: 32px;
 }
 
 #close-battle-button {

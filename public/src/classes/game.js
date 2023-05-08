@@ -163,6 +163,27 @@ const Game = (() => {
         Socket.requestAttack(attackerZoneId, defenderZoneId);
     };
 
+    const requestBlitz = () => {
+        if (GameStateMachine.state !== 'SelfAttackBattle') return;
+        Socket.requestBlitz(attackerZoneId, defenderZoneId);
+    };
+
+    const blitz = (result) => {
+        Board.setZoneTroop(result.attackerID, result.attackerTroops);
+        Board.setZoneTroop(result.defenderID, result.defenderTroops);
+        UI.updateBattleScreenTroops(result.attackerID, result.defenderID);
+        UI.updateBoardText();
+        if (result.attackerTroops <= 1) {
+            // defender wins
+            GameStateMachine.transition('lose');
+            Sound.play('battle-end-defeat');
+        } else if (result.defeat) {
+            // attacker wins
+            GameStateMachine.transition('win', SVG.getPathById(defenderZoneId));
+            Sound.play('battle-end-victory');
+        }
+    };
+
     const battle = (result) => {
         UI.battleScreenDisableInteraction();
 
@@ -432,5 +453,7 @@ const Game = (() => {
         setEnemyPhase,
         getEnemyPhase,
         reset,
+        requestBlitz,
+        blitz,
     };
 })();

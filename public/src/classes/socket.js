@@ -145,6 +145,12 @@ const Socket = (function () {
             Game.battle(res);
         });
 
+        socket.on('attack-blitz-response', (res) => {
+            console.log('attack-response', res);
+            if (!res.success) handleError(res.reason);
+            Game.blitz(res);
+        });
+
         socket.on('finish-attack-response', (res) => {
             console.log('finish-attack-response', res);
             if (!res.success) handleError(res.reason);
@@ -257,6 +263,14 @@ const Socket = (function () {
         });
     };
 
+    const requestBlitz = (attackerID, defenderID) => {
+        socket.emit('attack-blitz-request', {
+            roomCode,
+            attackerID,
+            defenderID,
+        });
+    };
+
     const requestAttackFortify = (
         attackerID,
         defenderID,
@@ -314,5 +328,6 @@ const Socket = (function () {
         requestCardTrade,
         requestCheat,
         requestReplay,
+        requestBlitz,
     };
 })();

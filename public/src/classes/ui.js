@@ -290,7 +290,11 @@ const UI = (() => {
         Game.cancelAttackBattle();
     });
     $('#battle-button').on('click', () => {
-        Game.requestBattle();
+        if ($('#skip-checkbox').prop('checked')) {
+            Game.requestBlitz();
+        } else {
+            Game.requestBattle();
+        }
     });
 
     // $(() => {
