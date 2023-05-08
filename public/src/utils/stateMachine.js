@@ -23,6 +23,9 @@ const createStateMachine = (defs, initialState) => {
             machine.data = defs[destState].data;
             return machine.state;
         },
+        reset: () => {
+            machine.state = initialState;
+        },
     };
 
     // directly invoke initial state's onEnter on initialization
@@ -490,7 +493,7 @@ const STATES = {
     },
 };
 
-const GameStateMachine = createStateMachine(STATES, 'Enemy');
+let GameStateMachine = createStateMachine(STATES, 'Enemy');
 
 $(() => {
     $('#play_area').on('click', (e) => {

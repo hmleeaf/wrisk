@@ -69,6 +69,10 @@ const Board = (() => {
         board = board_;
     };
 
+    const reset = () => {
+        board = undefined;
+    };
+
     return {
         getAdjacentEnemyZones,
         getZoneOwner,
@@ -81,5 +85,6 @@ const Board = (() => {
         initialize,
         updateBoard,
         getOccupied,
+        reset,
     };
 })();

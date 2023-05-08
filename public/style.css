@@ -762,7 +762,11 @@ button.small {
     font-weight: bold;
 }
 
-
+#error-overlay-content {
+    width: 384px;
+    height: 256px;
+    justify-content: space-evenly;
+}
 
 
 

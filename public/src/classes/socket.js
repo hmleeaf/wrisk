@@ -22,6 +22,7 @@ const Socket = (function () {
             console.log('join-waiting-area-response', res);
             if (!res.success) handleError(res.reason);
             SignInForm.hide();
+            ErrorOverlay.hide();
             WaitingOverlay.show();
         });
 
@@ -186,6 +187,24 @@ const Socket = (function () {
             console.log('cheat-response', res);
             if (!res.success) handleError(res.reason);
         });
+
+        socket.on('replay-response', (res) => {
+            console.log('replay-response', res);
+            if (!res.success) handleError(res.reason);
+            Game.reset();
+            EndOverlay.hide();
+            if (res.waiting) WaitingOverlay.show();
+        });
+
+        socket.on('quit-game-notification', (res) => {
+            console.log('quit-game-notification', res);
+            if (!res.success) handleError(res.reason);
+            Game.reset();
+            ErrorOverlay.show(
+                'Your opponent left the game. You will be put into waiting.'
+            );
+            socket.emit('join-waiting-area-request');
+        });
     };
 
     // This function disconnects the socket from the server
@@ -195,7 +214,12 @@ const Socket = (function () {
     };
 
     const handleError = (reason) => {
-        console.log('error: ' + reason);
+        console.error('error: ' + reason);
+        Game.reset();
+        disconnect();
+        Authentication.signOut();
+        ErrorOverlay.show('An error has occurred: ' + reason);
+        TitleOverlay.show();
     };
 
     const requestDraft = (zoneId, troops) => {
@@ -267,6 +291,12 @@ const Socket = (function () {
         });
     };
 
+    const requestReplay = () => {
+        socket.emit('replay-request', {
+            roomCode,
+        });
+    };
+
     return {
         getSocket,
         connect,
@@ -280,5 +310,6 @@ const Socket = (function () {
         requestFortify,
         requestCardTrade,
         requestCheat,
+        requestReplay,
     };
 })();

@@ -212,8 +212,16 @@ const Cards = (() => {
         $('#cards-error').text('error');
     };
 
+    const reset = () => {
+        cards = [];
+        selectedCards = [];
+        if (errorTimeout) clearTimeout(errorTimeout);
+        errorTimeout = undefined;
+    };
+
     return {
         initialize,
         updateCards,
+        reset,
     };
 })();

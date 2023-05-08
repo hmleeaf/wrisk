@@ -376,6 +376,27 @@ const Game = (() => {
         UI.updateBoardZones();
     };
 
+    const reset = () => {
+        playerIdx = undefined;
+        currPlayerIdx = undefined;
+        enemyPhase = 'fortify';
+        originalZoneTroops = undefined;
+        originalNewTroops = undefined;
+        draftingZoneId = undefined;
+        editingZoneTroops = undefined;
+        editingNewTroops = undefined;
+        attackerZoneId = undefined;
+        defenderZoneId = undefined;
+        fortifyFromZoneId = undefined;
+        fortifyToZoneCandidateIds = undefined;
+        fortifyToZoneId = undefined;
+
+        Cards.reset();
+        Board.reset();
+        UI.reset();
+        GameStateMachine.reset();
+    };
+
     return {
         beginDraft,
         cancelDraft,
@@ -409,5 +430,6 @@ const Game = (() => {
         commitFortifyDeploy,
         setEnemyPhase,
         getEnemyPhase,
+        reset,
     };
 })();

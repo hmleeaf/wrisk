@@ -150,6 +150,10 @@ const EndOverlay = (() => {
             });
         });
 
+        $('#end-rematch-button').on('click', () => {
+            Socket.requestReplay();
+        });
+
         $('#end-overlay').hide();
     };
 
@@ -175,13 +179,12 @@ const EndOverlay = (() => {
         $('#stat-rounds').text(data.round);
 
         const seconds = data.duration / 1000;
-        const minutes = seconds / 60;
+        const minutes = Math.floor(seconds / 60);
+        console.log(seconds, minutes);
         $('#stat-time').text(
-            `${Math.floor(minutes)} minute${
-                Math.floor(minutes) === 1 ? '' : 's'
-            } ${Math.floor(seconds) - Math.floor(minutes * 60)} second${
-                Math.floor(seconds) - Math.floor(minutes * 60) === 1 ? '' : 's'
-            }`
+            `${minutes} minute${minutes === 1 ? '' : 's'} ${
+                Math.floor(seconds) - minutes * 60
+            } second${Math.floor(seconds) - minutes * 60 === 1 ? '' : 's'}`
         );
 
         updateRankingContainer(
@@ -200,11 +203,32 @@ const EndOverlay = (() => {
             'ranking-troops-lost-container'
         );
 
-        $('#end-overlay').show();
+        $('#end-overlay').fadeIn();
     };
 
     const hide = () => {
         $('#end-overlay').hide();
+    };
+
+    return { initialize, show, hide };
+})();
+
+const ErrorOverlay = (() => {
+    const initialize = () => {
+        $('#error-overlay-button').on('click', () => {
+            hide();
+        });
+
+        $('#error-overlay').hide();
+    };
+
+    const show = (message) => {
+        $('#error-overlay-text').text(message);
+        $('#error-overlay').show();
+    };
+
+    const hide = () => {
+        $('#error-overlay').hide();
     };
 
     return { initialize, show, hide };
@@ -618,6 +642,16 @@ const UI = (() => {
         );
         players = data.players;
         currentPlayerIdx = data.currentPlayerIndex;
+
+        $('#deployable-troops').removeClass('player-0');
+        $('#deployable-troops').removeClass('player-1');
+        $('#self-troops-text-wrapper').removeClass('player-0');
+        $('#self-troops-text-wrapper').removeClass('player-1');
+        $('#enemy-troops-text-wrapper').removeClass('player-0');
+        $('#enemy-troops-text-wrapper').removeClass('player-1');
+        $('#next-phase-button').removeClass('player-0');
+        $('#next-phase-button').removeClass('player-1');
+
         $('#deployable-troops').addClass('player-' + data.currentPlayerIndex);
         $('#self-troops-text-wrapper').addClass('player-' + playerIdx);
         $('#enemy-troops-text-wrapper').addClass(
@@ -647,6 +681,12 @@ const UI = (() => {
         //         phase: 'draft',
         //         currentPlayerIdx,
         //     });
+    };
+
+    const reset = () => {
+        currentPlayerIdx = undefined;
+        playerIdx = undefined;
+        players = undefined;
     };
 
     return {
@@ -681,6 +721,7 @@ const UI = (() => {
         getCurrentPlayerIdx,
         updateCurrentPlayerIdx,
         getPlayerIdx,
+        reset,
     };
 })();
 
