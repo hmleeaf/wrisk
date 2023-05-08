@@ -150,7 +150,7 @@ const Notification = (() => {
             //     card
             // }
             $('#card-notification-card-wrapper').empty();
-            const cardDiv = $('<div class="card"></div>');
+            const cardDiv = $('<div class="card no-pointer-event"></div>');
             cardDiv.append($(CARDS_SVG[event.data.card]));
             cardDiv.append(event.data.card);
             $('#card-notification-card-wrapper').append(cardDiv);

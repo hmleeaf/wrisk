@@ -701,6 +701,10 @@ button.small {
     fill: var(--confirm-color-outline);
 }
 
+.no-pointer-event {
+    pointer-events: none;
+}
+
 #close-cards-overlay-button {
     position: absolute;
     top: 4vh;
