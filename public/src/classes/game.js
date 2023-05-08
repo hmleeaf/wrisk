@@ -27,6 +27,11 @@ const Game = (() => {
         editingZoneTroops = UI.getTroopByZone(zone);
         editingNewTroops = originalNewTroops;
         draftingZoneId = SVG.parseSvgToId(zone);
+
+        while (tryIncreaseDraft());
+
+        UI.updateTroopSelectorText();
+        UI.updateBoardText();
     };
 
     const cancelDraft = () => {
@@ -65,10 +70,18 @@ const Game = (() => {
             editingZoneTroops++;
             Board.increaseZoneTroop(draftingZoneId);
 
-            if (GameStateMachine.state === 'SelfAttackDeploy')
+            console.log(GameStateMachine.state);
+
+            if (
+                GameStateMachine.state === 'SelfAttackDeploy' ||
+                GameStateMachine.state === 'SelfAttackBattle'
+            )
                 Board.decreaseZoneTroop(attackerZoneId);
 
-            if (GameStateMachine.state === 'SelfFortifyDeploy')
+            if (
+                GameStateMachine.state === 'SelfFortifyDeploy' ||
+                GameStateMachine.state === 'SelfFortifySelected'
+            )
                 Board.decreaseZoneTroop(fortifyFromZoneId);
 
             return editingNewTroops;
@@ -98,7 +111,7 @@ const Game = (() => {
         }
     };
 
-    const getDeployableTroops = () => editingNewTroops;
+    const getDeployedTroops = () => originalNewTroops - editingNewTroops;
 
     let attackerZoneId;
     let defenderZoneId;
@@ -214,9 +227,12 @@ const Game = (() => {
         editingZoneTroops = originalZoneTroops;
         editingNewTroops = originalNewTroops;
 
+        while (tryIncreaseDraft());
+
         UI.updateTroopSelectorText();
         UI.updateBoardTextBackground();
         UI.updateBoardZones();
+        UI.updateBoardText();
         UI.showTroopSelector();
         UI.hideTroopSelectorCancelButton();
         UI.hideInfoPanel();
@@ -297,12 +313,18 @@ const Game = (() => {
         editingNewTroops = originalNewTroops;
         originalFortifyToTroops = Board.getZoneTroop(fortifyToZoneId);
 
+        while (tryIncreaseDraft());
+
         UI.updateTroopSelectorText();
+        UI.updateBoardTextBackground();
+        UI.updateBoardZones();
+        UI.updateBoardText();
         UI.showTroopSelector();
         UI.hideInfoPanel();
         UI.highlightBoardZones(
             SVG.getPathsByIds([fortifyFromZoneId, fortifyToZoneId])
         );
+        UI.outlineBoardZone(SVG.getPathById(fortifyFromZoneId));
     };
 
     const requestFortifyDeploy = () => {
@@ -356,7 +378,7 @@ const Game = (() => {
         commitDraft,
         tryIncreaseDraft,
         tryDecreaseDraft,
-        getDeployableTroops,
+        getDeployedTroops,
         beginAttack,
         cancelAttack,
         checkZoneCanAttackTo,

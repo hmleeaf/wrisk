@@ -28,7 +28,7 @@ const Socket = (function () {
         socket.on('game-start-notification', (res) => {
             WaitingOverlay.hide();
             SignInForm.hide();
-            console.log(res);
+            console.log('game-start-notification', res);
             roomCode = res.roomCode;
             Board.initialize(res.board);
             Game.initialize(res);

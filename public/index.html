@@ -153,12 +153,20 @@
                 </svg>
             </button>
         </div>
-        <div id="deployable-troops" class="text-display">
-            <svg viewBox="0 0 50 50">
-                <text id="info-text" x="25" y="32">
-                    
-                </text>
-            </svg>
+        <div id="info-panel-display">
+            <div id="deployable-troops" class="text-display">
+                <svg viewBox="0 0 50 50">
+                    <text id="deployable-troops-text" x="25" y="32">
+                        
+                    </text>
+                </svg>
+            </div>
+            <div id="dice-spinner-wrapper">
+                <svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+                    <rect stroke-width="0" rx="32" id="svg_1" height="128.125" width="127.8125" y="-0.0625" x="0.09375" stroke="#000" fill="#bf0000"/>
+                    <ellipse stroke-width="0" ry="12" rx="12" id="svg_8" cy="64" cx="64" stroke="#000" fill="#ffffff"/>
+                </svg>
+            </div>
         </div>
     </div>
 
@@ -219,7 +227,7 @@
             <div id="self-troops-text-wrapper" class="text-display">
                 <svg viewBox="0 0 50 50">
                     <text id="self-troops-text" x="25" y="32" class="svg-text">
-                        5
+                        
                     </text>
                 </svg>
             </div>
@@ -240,14 +248,14 @@
             <div id="enemy-troops-text-wrapper" class="text-display">
                 <svg viewBox="0 0 50 50">
                     <text id="enemy-troops-text" x="25" y="32" class="svg-text">
-                        2
+                        
                     </text>
                 </svg>
             </div>
         </div>
         <div id="enemy-dice-wrapper" class="dice-wrapper">
-            <div id="enemy-dice-1" class="dice"></div>
-            <div id="enemy-dice-2" class="dice"></div>
+            <div id="enemy-dice-1" class="dice enemy"></div>
+            <div id="enemy-dice-2" class="dice enemy"></div>
         </div>
         <div id="battle-buttons-wrapper">
             <button id="battle-button">
@@ -353,21 +361,21 @@
         </div>
     </div>
 
-    <div id="waiting-overlay" class="overlay row">
+    <div id="waiting-overlay" class="overlay backdrop row">
         <div id="waiting-window" class="content row">
             Waiting on an opponent...
         </div>
     </div>
 
-    <div id="signin-overlay" class="overlay row">
+    <div id="signin-overlay" class="overlay backdrop row">
         <div class="content shadow row">
             <form id="signin-form" class="col">
-                <div class="caption">SIGN IN WITH YOUR ACCOUNT</div>
+                <div class="caption text-stroke" data-text="SIGN IN WITH YOUR ACCOUNT">SIGN IN WITH YOUR ACCOUNT</div>
                 <div class="spacer-0"></div>
                 <input id="signin-username" placeholder="Enter your username"></input>
                 <input id="signin-password" type="password" placeholder="Enter your password"></input>
                 <div class="spacer-0"></div>
-                <button type="submit">Sign In</button>
+                <button type="submit" class="confirm">Sign In</button>
                 <div id="signin-message" class="warning center"></div>
                 <div class="spacer-grow"></div>
             </form>
@@ -375,7 +383,7 @@
             <div class="spacer-0"></div>
 
             <form id="register-form" class="col">
-                <div class="caption">OR, REGISTER IF YOU DO NOT HAVE ONE</div>
+                <div class="caption text-stroke" data-text="OR, REGISTER IF YOU DO NOT HAVE ONE">OR, REGISTER IF YOU DO NOT HAVE ONE</div>
                 <div class="spacer-0"></div>
                 <input id="register-username" maxlength="10" placeholder="Enter your username"></input>
                 <select id="register-avatar">

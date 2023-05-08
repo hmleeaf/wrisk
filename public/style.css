@@ -2,62 +2,64 @@
     --player0-color-zone: #e93423;
     --player0-color-background: #d55049;
     --player0-color-outline: #802f2e;
-
+    --player0-background-gradient: linear-gradient(0, #973935 0%, #ec655f 100%);
+    
     --player1-color-zone: #557c47;
     --player1-color-background: #add773;
     --player1-color-outline: #628146;
+    --player1-background-gradient: linear-gradient(0, #76934e 0%, #dbfd92 100%);
 
-    --popup-background-color-transparent: rgba(0, 0, 0, 0.5);
-    --notification-background-color-transparent: rgba(255, 255, 255, 0.8);
+    --overlay-background: rgba(0, 0, 0, 0.5);
+    --notification-background: rgba(255, 255, 255, 0.8);
 
-    --cancel-color-text: #802f2e;
-    --cancel-color-background: #d55049;
-    --cancel-color-outline: #802f2e;
+    --cancel-color-text: #391513;
+    --cancel-color-background: linear-gradient(0, #8e3531 0%, #dd544d 100%);
+    --cancel-color-outline: #391513;
 
-    --confirm-color-text: #628146;
-    --confirm-color-background: #add773;
-    --confirm-color-outline: #628146;
+    --confirm-color-text: #5b7532;
+    --confirm-color-background: linear-gradient(0, #7a9d43 0%, #cbfd6f 100%);
+    --confirm-color-outline: #5b7532;
 
-    --disabled-color-text: #444444;
-    --disabled-color-background: #999999;
-    --disabled-color-outline: #444444;
+    --disabled-color-text: #5b5b5b;
+    --disabled-color-background: linear-gradient(0, #777777 0%, #c5c5c5 100%);
+    --disabled-color-outline: #5b5b5b;
 
     --error-color-text: #802f2e;
 
+    --card-color-background: linear-gradient(0, #f0d9ad 0%, #fffef9 100%);
+    --card-color-outline: #605447;
+    --card-color-text: #605447;
+
+    --button-color-text: #6e6d69;
+    --button-color-background: linear-gradient(0, #918f8a 0%, #e6e2da 100%);
+    --button-color-outline: #6e6d69;
+
+    /* --button-color-text: #333333;
+    --button-color-background: linear-gradient(0, #54616c 0%, #9eb1b9 100%);
+    --button-color-outline: #333333; */
+
+    --content-color-background: radial-gradient(circle, #78aee7 0%, #2a6281 100%);
+    --content-color-outline: #5882b0;
+
     --material-icons-color: black;
-    --field-color: gray;
-    --field-background: white;
-    --field-background-hover: #eee;
-    --input-background: #eee;
-    --overlay-background: rgba(245, 158, 114, 0.8);
-    --overlay-caption-color: #eb4a40;
-    --overlay-content-background: linear-gradient(white, #fde0c5);
-
-    --header-background: linear-gradient(to right, #eb4a40, #f59e72);
-    --main-panel-background: linear-gradient(white, #fde0c5);
-    --online-users-panel-background: linear-gradient(to right, #fde0c5, #facba6);
-    --chat-panel-background: none;
-
-    --title-color: white;
-    --caption-color: white;
+    --input-background: white;
+    --input-outline-color: #353535;
+    
+    --text-stroke-font-color: white;
+    --text-stroke-color: #2c2c2c;
 
     --font-color: black;
-    --date-color: gray;
 
-    --register-form-background: linear-gradient(#fde0c5, #facba6);
+    --register-form-background: rgba(16, 36, 49, 0.315);
     --warning-color: red;
 
-    --button-color: white;
-    --button-background: #f2855d;
-    --button-background-hover: #f8b58b;
-    --button-outline: black;
+    --backdrop-background: radial-gradient(circle, #516683 0%, #1d3458 100%);
 }
 
 * {
     font-family: "Cairo", sans-serif;
     color: inherit;
     box-sizing: border-box;
-    font-weight: 800;
     user-select: none;
 }
 
@@ -71,7 +73,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: black;
+    background: black;
 }
 
 svg#play_area {
@@ -104,7 +106,7 @@ g#areas, g#text-backgrounds, g#texts {
     cursor: pointer;
 }
 
-ellipse {
+g#text-backgrounds ellipse {
     stroke-width: 3px;
     stroke: #000;
 }
@@ -112,49 +114,42 @@ ellipse {
 button {
     font-weight: bold;
     height: 48px;
-    border: 3px solid var(--button-outline);
-    border-radius: 8px;
-    color: var(--button-color);
-    background: var(--button-background);
+    border: 3px solid var(--button-color-outline);
+    border-radius: 24px;
+    color: var(--button-color-text);
+    background: var(--button-color-background);
     box-shadow: 0px 3px 3px rgb(0, 0, 0, 0.4);
     padding: 0 32px;
-    transition: 0.3s all;
+    transition: 0.3s filter;
     cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 button:hover {
-    background: var(--button-background-hover);
+    filter: brightness(1.1);
 }
 button:active {
     margin: 2px -2px -2px 2px;
     box-shadow: 0px 0px;
+    filter: brightness(0.9);
 }
 button.confirm {
     color: var(--confirm-color-text);
     border-color: var(--confirm-color-outline);
-    background-color: var(--confirm-color-background);
-}
-button.confirm:hover {
     background: var(--confirm-color-background);
-    filter: brightness(1.1);
 }
 button.cancel {
     color: var(--cancel-color-text);
     border-color: var(--cancel-color-outline);
-    background-color: var(--cancel-color-background);
-}
-button.cancel:hover {
     background: var(--cancel-color-background);
-    filter: brightness(1.1);
 }
 button:disabled {
     pointer-events: none;
-    cursor: default;
+    cursor: not-allowed;
     color: var(--disabled-color-text);
     border-color: var(--disabled-color-outline);
-    background-color: var(--disabled-color-background);
+    background: var(--disabled-color-background);
 }
 button:disabled text {
     stroke: var(--disabled-color-text);
@@ -207,7 +202,7 @@ button.small {
     bottom: 0px;
     left: 50%;
     transform: translateX(-50%);
-    background-color: var(--popup-background-color-transparent);
+    background: var(--overlay-background);
     width: 640px;
     height: 240px;
     display: flex;
@@ -221,6 +216,10 @@ button.small {
     border-top-left-radius: 64px;
 }
 
+#info-panel-display {
+    position: relative;
+}
+
 .text-display {
     width: 64px;
     height: 64px;
@@ -230,6 +229,7 @@ button.small {
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
 }
 
 .text-display svg {
@@ -243,7 +243,7 @@ button.small {
 }
 
 .no-backdrop {
-    background-color: transparent;
+    background: transparent;
     border: none;
 }
 
@@ -298,7 +298,7 @@ button.small {
     width: 480px;
     height: 96px;
     border-radius: 48px;
-    background-color: var(--popup-background-color-transparent);
+    background: var(--overlay-background);
     /* border: solid 5px #000; */
     position: absolute;
     left: 50%;
@@ -321,7 +321,7 @@ button.small {
     top: 0;
     left: 50%;
     transform: translateX(-50%);
-    background-color: var(--notification-background-color-transparent);
+    background: var(--notification-background);
     width: 480px;
     height: 48px;
     border-bottom-left-radius: 24px;
@@ -338,7 +338,7 @@ button.small {
     top: 0;
     left: 0;
     backdrop-filter: blur(3px);
-    background-color: var(--popup-background-color-transparent);
+    background: var(--overlay-background);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -402,7 +402,15 @@ button.small {
 }
 
 .dice ellipse {
-    stroke: none;
+    /* stroke: none; */
+}
+
+.dice.enemy rect {
+    fill: white;
+}
+
+.dice.enemy ellipse, .dice.enemy path {
+    fill: black;
 }
 
 #battle-buttons-wrapper {
@@ -414,7 +422,7 @@ button.small {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-color: var(--notification-background-color-transparent);
+    background: var(--notification-background);
     width: 360px;
     height: 180px;
     border-radius: 90px;
@@ -450,7 +458,7 @@ button.small {
 
 .player-0 {
     border-color: var(--player0-color-outline);
-    background-color: var(--player0-color-background);
+    background: var(--player0-background-gradient);
 }
 
 .player-0 text {
@@ -459,7 +467,7 @@ button.small {
 
 .player-1 {
     border-color: var(--player1-color-outline);
-    background-color: var(--player1-color-background);
+    background: var(--player1-background-gradient);
 }
 
 .player-1 text {
@@ -495,10 +503,11 @@ button.small {
 .card {
     width: 128px;
     height: 192px;
-    background-color: white;
+    background: var(--card-color-background);
+    color: var(--card-color-text);
     border-radius: 8px;
     padding: 16px;
-    border: solid 5px black;
+    border: solid 5px var(--card-color-outline);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -509,6 +518,7 @@ button.small {
 }
 
 .card path {
+    fill: var(--card-color-text);
     transition: 0.2s all;
 }
 
@@ -561,6 +571,31 @@ button.small {
     height: 320px;
 }
 
+@keyframes spin {
+    from { 
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+    to { 
+        transform: translate(-50%, -50%) rotate(359deg);
+    }
+}
+
+#dice-spinner-wrapper {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 64px;
+    height: 64px;
+    animation: spin 5s infinite linear;
+}
+
+#dice-spinner-wrapper ellipse {
+    /* stroke: none; */
+}
+
+
+
+
 /*       */
 /* Login */
 /*       */
@@ -580,12 +615,30 @@ button.small {
     width: 100%; height: 100%;
     background: var(--overlay-background);
 }
-.overlay .caption {
-    font-size: 120%;
-    color: var(--overlay-caption-color);
+.overlay.backdrop {
+    background: var(--backdrop-background);
 }
-.overlay .content {
-    background: var(--overlay-content-background);
+.overlay .caption {
+    font-size: 1.2em;
+}
+.text-stroke {
+    position: relative;
+    z-index: 1;
+    color: var(--text-stroke-font-color)
+}
+.text-stroke:after {
+    content: attr(data-text);
+    -webkit-text-stroke: 5px var(--text-stroke-color);
+    color: var(--text-stroke-color);
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: -1;
+}
+.content {
+    background: var(--content-color-background);
+    border: solid 3px var(--content-color-outline);
+    border-radius: 16px;
 }
 .warning {
     font-weight: bold;
@@ -600,8 +653,12 @@ input, select {
     font-size: 1rem;
     background: var(--input-background);
     border: none;
-    border-radius: 20px;
-    padding: 10px 15px;
+    border-radius: 12px;
+    padding: 8px 16px;
+    outline: none;
+}
+input:focus {
+    outline: solid 3px var(--input-outline-color);
 }
 input::placeholder, select {
     color: gray;
@@ -625,111 +682,6 @@ button.icon:hover {
 button.icon:active {
     margin: 2px -2px -2px 2px;
 }
-/* Data field caption and content */
-.field-content {
-    border-radius: 50px;
-    padding: 10px 15px;
-    background: var(--field-background);
-    transition: 1s background;
-}
-.field-content * {
-    color: var(--field-color);
-}
-.field-content:hover {
-    background: var(--field-background-hover);
-}
-.user-name {
-    white-space: nowrap;
-}
-
-/* Top level container */
-#container {
-    align-items: stretch;
-    gap: 0px;
-    width: 100%;
-    height: 100%;
-    padding: 0;
-}
-
-/* Header */
-#header {
-    height: 80px;
-    background: var(--header-background);
-    padding: 0 20px;
-}
-#title {
-    font-family: Abel, sans-serif;
-    font-size: 300%;
-    text-transform: uppercase;
-    color: var(--title-color);
-    user-select: none;
-}
-#title .material-icons {
-    color: var(--title-color);
-    font-size: 36px;
-}
-#user-panel {
-    padding: 0;
-}
-#signin-user {
-    cursor: pointer;
-}
-
-/* Main panel */
-#main-panel {
-    height: calc(100% - 80px);
-    background: var(--main-panel-background);
-}
-
-/* Chat area */
-#chat-panel {
-    flex-grow: 1;
-    align-items: stretch;
-    height: 100%;
-    background: var(--chat-panel-background);
-    padding: 0;
-}
-#chat-area {
-    height: 100%;
-    align-items: flex-start;
-    justify-content: start;
-    gap: 20px;
-    overflow-y: auto;
-    padding: 10px;
-}
-#typing-indicator {
-    padding: 10px;
-    font-size: 14px;
-    font-style: italic;
-}
-.chat-message-panel {
-    align-items: flex-start;
-    padding: 0;
-}
-.chat-message {
-    align-items: start;
-    gap: 5px;
-    padding: 0;
-}
-.chat-date {
-    font-size: 75%;
-    color: var(--date-color);
-}
-
-/* Online users panel */
-#online-users-panel {
-	flex: 0 0 250px;
-    height: 100%;
-    padding: 0;
-    background: var(--online-users-panel-background);
-}
-#online-users-area {
-    flex-grow: 1;
-    width: 100%;
-    align-items: flex-start;
-    justify-content: start;
-    overflow-y: auto;
-}
 
 /* Signin overlay */
 #signin-form {
@@ -739,11 +691,6 @@ button.icon:active {
 #register-form {
     width: 380px;
     background: var(--register-form-background);
+    border-radius: 32px;
     padding: 20px;
-}
-
-/* Edit user overlay */
-#edit-user-form {
-    width: 270px;
-    align-self: stretch;
 }
