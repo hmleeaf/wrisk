@@ -1113,6 +1113,42 @@ io.on('connection', (socket) => {
       draftTroops: room.draftTroops
     })
   })
+
+  socket.on('cheat-request', req => {
+    let roomIndex = getRoomIndexByRoomCode(req.roomCode);
+    if (roomIndex === -1) {
+      socket.emit('cheat-response', {
+        success: false,
+        reason: 'RoomCode not found.'
+      })
+      return;
+    }
+    const room = rooms[roomIndex];
+    const playerIndex = room.players.findIndex(player => player.socketID === socket.id);
+    if (playerIndex === -1) {
+      socket.emit('cheat-response', {
+        success: false,
+        reason: 'No permission to cheat in this room.'
+      })
+      return;
+    }
+
+    socket.emit('cheat-response', {
+      success: true,
+    })
+    for(let i = 0; i < room.board.territories.length; i++) {
+      if (room.board.territories.owner === playerIndex) {
+        room.board.territories.troops = 99;
+      }
+    }
+    io.to(room.roomCode).emit('map-update-notification', {
+      players: removeKeyFromArray(room.players, 'cards'),
+      roomCode: room.roomCode,
+      currentPlayerIndex: room.currentPlayerIndex,
+      board: room.board,
+      state: room.state,
+    })
+  })
 });
 
 // Use a web server to listen at port 8000
