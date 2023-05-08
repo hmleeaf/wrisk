@@ -402,6 +402,41 @@ function riskAttack(attackerTroops, defenderTroops) {
   };
 }
 
+function riskAttackBlitz(attackerTroops, defenderTroops) {
+  function rollDice(numDice) {
+    const rolls = [];
+    for (let i = 0; i < numDice; i++) {
+      rolls.push(Math.floor(Math.random() * 6) + 1);
+    }
+    return rolls.sort((a, b) => b - a);
+  }
+  let attackerTroopsLost = 0;
+  let defenderTroopLost = 0;
+
+  while(attackerTroops > 1 && defenderTroops > 0) {
+    const attackerDice = rollDice(Math.min(attackerTroops - 1, 3));
+    const defenderDice = rollDice(Math.min(defenderTroops, 2));
+    for (let i = 0; i < Math.min(attackerDice.length, defenderDice.length); i++) {
+      if (attackerDice[i] > defenderDice[i]) {
+        defenderTroops--;
+        defenderTroopLost++;
+      } else {
+        attackerTroops--;
+        attackerTroopsLost++
+      }
+    }
+  }
+
+
+  return {
+    attackerTroops,
+    defenderTroops,
+    attackerTroopsLost,
+    defenderTroopLost
+  };
+}
+
+
 function isConnected(board, territoryId1, territoryId2, playerId) {
   const visited = new Set();
 
@@ -547,14 +582,14 @@ io.on('connection', (socket) => {
               .reduce((accumulator, currentValue) => accumulator + currentValue, 0)
         }
       });
-      console.log(JSON.stringify(players));
+
       const roomCode = generateRandomRoomCode();
       for (const player of players) {
         io.sockets.sockets.get(player.socketID).join(roomCode);
       }
 
       const roomClients = io.sockets.adapter.rooms.get(roomCode);
-      console.log(JSON.stringify(roomClients))
+
       rooms.push({
         players,
         roomCode,
@@ -843,6 +878,93 @@ io.on('connection', (socket) => {
       })
     }
   })
+
+  //Format of req JSON
+  // {
+  //   roomCode: string,
+  //   attackerID: int,
+  //   defenderID: int,
+  // }
+  socket.on('attack-blitz-request', req => {
+    let roomIndex = getRoomIndexByRoomCode(req.roomCode);
+    if (roomIndex === -1) {
+      socket.emit('attack-blitz-response', {
+        success: false,
+        reason: 'RoomCode not found.'
+      })
+      return;
+    }
+    const room = rooms[roomIndex];
+    if (room.players[room.currentPlayerIndex].socketID !== socket.id || room.state !== 'attack') {
+      socket.emit('attack-blitz-response', {
+        success: false,
+        reason: 'You have no permission to attack.'
+      })
+      return;
+    }
+
+    const attackerTerritoryIndex = room.board.territories.findIndex(territory => territory.id == req.attackerID);
+    const defenderTerritoryIndex = room.board.territories.findIndex(territory => territory.id == req.defenderID);
+    const attackerTerritory = room.board.territories.find(territory => territory.id == req.attackerID);
+    const defenderTerritory = room.board.territories.find(territory => territory.id == req.defenderID);
+    if (!attackerTerritory || !defenderTerritory) {
+      socket.emit('attack-blitz-response', {
+        success: false,
+        reason: 'Invalid attacking or defending territory.'
+      })
+      return;
+    }
+    if (attackerTerritory.owner !== room.currentPlayerIndex || defenderTerritory === room.currentPlayerIndex || attackerTerritory.troops <= 1) {
+      socket.emit('attack-blitz-response', {
+        success: false,
+        reason: 'Invalid attacking or defending territory.'
+      })
+      return;
+    }
+    const result = riskAttackBlitz(attackerTerritory.troops, defenderTerritory.troops)
+    rooms[roomIndex].players[attackerTerritory.owner].troopsLost += result.attackerTroopsLost;
+    rooms[roomIndex].players[attackerTerritory.owner].troopsKill += result.defenderTroopLost;
+
+    rooms[roomIndex].players[defenderTerritory.owner].troopsLost += result.defenderTroopLost;
+    rooms[roomIndex].players[defenderTerritory.owner].troopsKill += result.attackerTroopsLost;
+
+    rooms[roomIndex].board.territories[attackerTerritoryIndex].troops = result.attackerTroops;
+    rooms[roomIndex].board.territories[defenderTerritoryIndex].troops = result.defenderTroops;
+
+    if (result.defenderTroops > 0) {
+      //The defender survives
+      socket.emit('attack-blitz-response', {
+        success: true,
+        defeat: false,
+        attackerID: req.attackerID,
+        defenderID: req.defenderID,
+        attackerTroops: result.attackerTroops,
+        defenderTroops: result.defenderTroops,
+      })
+
+      io.to(room.roomCode).emit('map-update-notification', {
+        players: removeKeyFromArray(room.players, 'cards'),
+        roomCode: room.roomCode,
+        currentPlayerIndex: room.currentPlayerIndex,
+        board: room.board,
+        state: room.state,
+      })
+    } else {
+      //The attacker wins
+      rooms[roomIndex].state = 'post-attack-fortify';
+      rooms[roomIndex].postAttackPair = {attackerID: req.attackerID, defenderID: req.defenderID}
+      rooms[roomIndex].attackRecorded = true;
+      socket.emit('attack-blitz-response', {
+        success: true,
+        defeat: true,
+        attackerID: req.attackerID,
+        defenderID: req.defenderID,
+        attackerTroops: result.attackerTroops,
+        defenderTroops: result.defenderTroops,
+      })
+    }
+  })
+
 
   //Format of req JSON
   // {
