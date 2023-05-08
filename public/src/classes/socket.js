@@ -22,7 +22,6 @@ const Socket = (function () {
             console.log('join-waiting-area-response', res);
             if (!res.success) handleError(res.reason);
             SignInForm.hide();
-            ErrorOverlay.hide();
             WaitingOverlay.show();
         });
 
@@ -221,7 +220,7 @@ const Socket = (function () {
         console.error('error: ' + reason);
         Game.reset();
         disconnect();
-        Authentication.signOut();
+        Authentication.signout();
         ErrorOverlay.show('An error has occurred: ' + reason);
         TitleOverlay.show();
     };

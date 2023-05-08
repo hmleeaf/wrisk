@@ -67,7 +67,7 @@ const SignInForm = (function () {
 
     // This function shows the form
     const show = function () {
-        $('#signin-overlay').fadeIn(500);
+        $('#signin-overlay').show();
     };
 
     // This function hides the form
@@ -75,7 +75,7 @@ const SignInForm = (function () {
         $('#signin-form').get(0).reset();
         $('#signin-message').text('');
         $('#register-message').text('');
-        $('#signin-overlay').fadeOut(500);
+        $('#signin-overlay').hide();
     };
 
     return { initialize, show, hide };
@@ -180,7 +180,6 @@ const EndOverlay = (() => {
 
         const seconds = data.duration / 1000;
         const minutes = Math.floor(seconds / 60);
-        console.log(seconds, minutes);
         $('#stat-time').text(
             `${minutes} minute${minutes === 1 ? '' : 's'} ${
                 Math.floor(seconds) - minutes * 60
@@ -612,6 +611,7 @@ const UI = (() => {
         TitleOverlay,
         InstructionsOverlay,
         EndOverlay,
+        ErrorOverlay,
     ];
 
     // This function initializes the UI

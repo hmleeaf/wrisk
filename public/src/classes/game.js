@@ -76,8 +76,6 @@ const Game = (() => {
             editingZoneTroops++;
             Board.increaseZoneTroop(draftingZoneId);
 
-            console.log(GameStateMachine.state);
-
             if (
                 GameStateMachine.state === 'SelfAttackDeploy' ||
                 GameStateMachine.state === 'SelfAttackBattle'
@@ -161,6 +159,7 @@ const Game = (() => {
     const randomRollValue = () => Math.floor(Math.random() * 6) + 1;
 
     const requestBattle = () => {
+        if (GameStateMachine.state !== 'SelfAttackBattle') return;
         Socket.requestAttack(attackerZoneId, defenderZoneId);
     };
 
