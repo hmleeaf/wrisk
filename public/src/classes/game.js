@@ -212,7 +212,7 @@ const Game = (() => {
                     UI.battleScreenEnableInteraction();
                 }, 500); // time to show the disappear results for
             }, 500); // time to show the rolled dice for
-        }, 1000); // time to play the random rolling animation for
+        }, 500); // time to play the random rolling animation for
     };
 
     const finishAttack = () => {

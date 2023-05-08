@@ -719,11 +719,6 @@ button.small {
     font-size: 64px;
     stroke-width: 10px;
 }
-
-.end-stat-row {
-    padding: 0;
-}
-
 #waiting-window {
     width: 640px;
     height: 320px;
@@ -746,10 +741,27 @@ button.small {
     height: 64px;
     animation: spin 5s infinite linear;
 }
-
-#dice-spinner-wrapper ellipse {
-    /* stroke: none; */
+#end-stats-container {
+    width: 100%;
 }
+.ranking-row {
+    width: 100%;
+    gap: 24px;
+}
+.ranking-wrapper {
+    flex: 1;
+    
+}
+.ranking-container {
+    background: var(--register-form-background);
+    border-radius: 16px;
+    padding: 16px 32px;
+    align-items: flex-start;
+}
+.ranking-container div:first-child {
+    font-weight: bold;
+}
+
 
 
 

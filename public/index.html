@@ -369,83 +369,7 @@
         </button>
     </div>
 
-    <div id="end-overlay" class="overlay row">
-        <div id="end-window" class="content shadow col">
-            <div id="end-title">
-                <svg viewBox="0 0 480 120">
-                    <text x="240" y="60">
-                        You lost...
-                    </text>
-                </svg>
-            </div>
-            <div id="end-stats-container" class="col">
-                <div class="end-stat-row row">
-                    <div class="end-stat-name">
-                        Troops drafted: 
-                    </div>
-                    <div class="end-stat-value">
-                        62
-                    </div>
-                </div>
-                <div class="end-stat-row row">
-                    <div class="end-stat-name">
-                        Troops drafted: 
-                    </div>
-                    <div class="end-stat-value">
-                        62
-                    </div>
-                </div>
-                <div class="end-stat-row row">
-                    <div class="end-stat-name">
-                        Troops drafted: 
-                    </div>
-                    <div class="end-stat-value">
-                        62
-                    </div>
-                </div>
-                <div class="end-stat-row row">
-                    <div class="end-stat-name">
-                        Troops drafted: 
-                    </div>
-                    <div class="end-stat-value">
-                        62
-                    </div>
-                </div>
-                <div class="end-stat-row row">
-                    <div class="end-stat-name">
-                        Troops drafted: 
-                    </div>
-                    <div class="end-stat-value">
-                        62
-                    </div>
-                </div>
-                <div class="end-stat-row row">
-                    <div class="end-stat-name">
-                        Troops drafted: 
-                    </div>
-                    <div class="end-stat-value">
-                        62
-                    </div>
-                </div>
-                <div class="end-stat-row row">
-                    <div class="end-stat-name">
-                        Troops drafted: 
-                    </div>
-                    <div class="end-stat-value">
-                        62
-                    </div>
-                </div>
-            </div>
-            <div id="end-buttons-container" class="row">
-                <button id="end-rematch-button" class="confirm">
-                    Rematch
-                </button>
-                <button id="end-exit-button" class="cancel">
-                    Exit
-                </button>
-            </div>
-        </div>
-    </div>
+    
 
     <div id="waiting-overlay" class="overlay backdrop row">
         <div id="waiting-window" class="content row">
@@ -533,6 +457,69 @@
             <button id="title-instructions-button">
                 How to Play?
             </button>
+        </div>
+    </div>
+
+    <div id="end-overlay" class="overlay row" style="display: none;">
+        <div id="end-window" class="content shadow col">
+            <div id="end-title">
+                <svg viewBox="0 0 480 120">
+                    <text id="end-title-text" x="240" y="78">
+                        You lost...
+                    </text>
+                </svg>
+            </div>
+            <div id="end-stats-container" class="col">
+                <div class="row">
+                    <div class="row">
+                        <div class="end-stat-name">
+                            Total rounds: 
+                        </div>
+                        <div id="stat-rounds" class="end-stat-value">
+                            62
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="end-stat-name">
+                            Time elapsed:  
+                        </div>
+                        <div id="stat-time" class="end-stat-value">
+                            62
+                        </div>
+                    </div>
+                </div>
+                <div class="row ranking-row">
+                    <div class="col ranking-wrapper">
+                        <div class="ranking-title">Troops received</div>
+                        <div id="ranking-troops-received-container" class="ranking-container col">
+                            <div>You: 16</div>
+                            <div>May Wong: 17</div>
+                        </div>
+                    </div>
+                    <div class="col ranking-wrapper">
+                        <div class="ranking-title">Troops killed</div>
+                        <div id="ranking-troops-killed-container" class="ranking-container col">
+                            <div>You: 16</div>
+                            <div>May Wong: 17</div>
+                        </div>
+                    </div>
+                    <div class="col ranking-wrapper">
+                        <div class="ranking-title">Troops lost</div>
+                        <div id="ranking-troops-lost-container" class="ranking-container col">
+                            <div>You: 16</div>
+                            <div>May Wong: 17</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="end-buttons-container" class="row">
+                <button id="end-rematch-button" class="confirm">
+                    Rematch
+                </button>
+                <button id="end-exit-button" class="cancel">
+                    Exit
+                </button>
+            </div>
         </div>
     </div>
 

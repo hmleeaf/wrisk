@@ -140,6 +140,76 @@ const InstructionsOverlay = (() => {
     return { initialize, show, hide };
 })();
 
+const EndOverlay = (() => {
+    const initialize = () => {
+        $('#end-exit-button').on('click', () => {
+            Authentication.signout(() => {
+                TitleOverlay.show();
+                hide();
+                Socket.disconnect();
+            });
+        });
+
+        $('#end-overlay').hide();
+    };
+
+    const updateRankingContainer = (players, rankName, containerId) => {
+        $('#' + containerId).empty();
+        players.sort((a, b) => a[rankName] - b[rankName]).reverse();
+        players.forEach((player) => {
+            const name =
+                Authentication.getUser().username === player.user.username
+                    ? 'You'
+                    : player.user.name;
+            $('#' + containerId).append(
+                $(`<div>${name}: ${player[rankName]}</div>`)
+            );
+        });
+    };
+
+    const show = (data) => {
+        $('#end-title-text').text(
+            data.winner === UI.getPlayerIdx() ? 'You won!' : 'You lost...'
+        );
+
+        $('#stat-rounds').text(data.round);
+
+        const seconds = data.duration / 1000;
+        const minutes = seconds / 60;
+        $('#stat-time').text(
+            `${Math.floor(minutes)} minute${
+                Math.floor(minutes) === 1 ? '' : 's'
+            } ${Math.floor(seconds) - Math.floor(minutes * 60)} second${
+                Math.floor(seconds) - Math.floor(minutes * 60) === 1 ? '' : 's'
+            }`
+        );
+
+        updateRankingContainer(
+            data.players,
+            'troopsReceived',
+            'ranking-troops-received-container'
+        );
+        updateRankingContainer(
+            data.players,
+            'troopsKill',
+            'ranking-troops-killed-container'
+        );
+        updateRankingContainer(
+            data.players,
+            'troopsLost',
+            'ranking-troops-lost-container'
+        );
+
+        $('#end-overlay').show();
+    };
+
+    const hide = () => {
+        $('#end-overlay').hide();
+    };
+
+    return { initialize, show, hide };
+})();
+
 const UI = (() => {
     // set up default behaviors for HTML elements
     $('#popup-troops-selector').hide();
@@ -198,13 +268,6 @@ const UI = (() => {
     });
     $('#battle-button').on('click', () => {
         Game.requestBattle();
-    });
-    $('#end-exit-button').on('click', () => {
-        Authentication.signout(() => {
-            SignInForm.show();
-            hideEndScreen();
-            Socket.disconnect();
-        });
     });
 
     // $(() => {
@@ -515,14 +578,6 @@ const UI = (() => {
         });
     };
 
-    const showEndScreen = () => {
-        $('#end-overlay').show();
-    };
-
-    const hideEndScreen = () => {
-        $('#end-overlay').hide();
-    };
-
     // The components of the UI are put here
     const components = [
         SignInForm,
@@ -530,6 +585,7 @@ const UI = (() => {
         WaitingOverlay,
         TitleOverlay,
         InstructionsOverlay,
+        EndOverlay,
     ];
 
     // This function initializes the UI
@@ -553,6 +609,7 @@ const UI = (() => {
 
     const getCurrentPlayerIdx = () => currentPlayerIdx;
     const updateCurrentPlayerIdx = (i) => (currentPlayerIdx = i);
+    const getPlayerIdx = () => playerIdx;
 
     const initializeGame = (data) => {
         playerIdx = data.players.findIndex(
@@ -621,10 +678,9 @@ const UI = (() => {
         battleScreenEnableInteraction,
         initialize,
         initializeGame,
-        showEndScreen,
-        hideEndScreen,
         getCurrentPlayerIdx,
         updateCurrentPlayerIdx,
+        getPlayerIdx,
     };
 })();
 
@@ -656,5 +712,4 @@ $(() => {
     );
 
     Cards.initialize();
-    UI.hideEndScreen();
 });

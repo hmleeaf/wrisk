@@ -179,11 +179,12 @@ const Socket = (function () {
 
         socket.on('end-game-notification', (res) => {
             console.log('end-game-notification', res);
-            UI.showEndScreen();
+            EndOverlay.show(res);
         });
 
         socket.on('cheat-response', (res) => {
             console.log('cheat-response', res);
+            if (!res.success) handleError(res.reason);
         });
     };
 
