@@ -130,16 +130,7 @@ app.post('/signin', (req, res) => {
 
 // Handle the /validate endpoint
 app.get('/validate', (req, res) => {
-  //
-  // B. Getting req.session.user
-  //
-  const {user} = req.session;
-
-  //
-  // D. Sending a success response with the user account
-  //
-  if (user) res.json({status: 'success', user});
-  else res.json({status: 'error', error: 'No sessions exist.'});
+  res.json({status: 'error', error: 'Validate is disabled.'})
 });
 
 // Handle the /signout endpoint
