@@ -95,6 +95,51 @@ const WaitingOverlay = (() => {
     return { initialize, show, hide };
 })();
 
+const TitleOverlay = (() => {
+    const initialize = () => {
+        $('#title-instructions-button').on('click', () => {
+            hide();
+            InstructionsOverlay.show();
+        });
+
+        $('#title-play-button').on('click', () => {
+            hide();
+            SignInForm.show();
+        });
+    };
+
+    const show = () => {
+        $('#title-overlay').show();
+    };
+
+    const hide = () => {
+        $('#title-overlay').hide();
+    };
+
+    return { initialize, show, hide };
+})();
+
+const InstructionsOverlay = (() => {
+    const initialize = () => {
+        $('#instructions-back-button').on('click', () => {
+            hide();
+            TitleOverlay.show();
+        });
+
+        hide();
+    };
+
+    const show = () => {
+        $('#instructions-overlay').show();
+    };
+
+    const hide = () => {
+        $('#instructions-overlay').hide();
+    };
+
+    return { initialize, show, hide };
+})();
+
 const UI = (() => {
     // set up default behaviors for HTML elements
     $('#popup-troops-selector').hide();
@@ -479,7 +524,13 @@ const UI = (() => {
     };
 
     // The components of the UI are put here
-    const components = [SignInForm, Notification];
+    const components = [
+        SignInForm,
+        Notification,
+        WaitingOverlay,
+        TitleOverlay,
+        InstructionsOverlay,
+    ];
 
     // This function initializes the UI
     const initialize = function () {
@@ -592,6 +643,8 @@ $(() => {
     Authentication.validate(
         () => {
             Socket.connect();
+            TitleOverlay.hide();
+            InstructionsOverlay.hide();
         },
         () => {
             // SignInForm.show();
