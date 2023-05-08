@@ -615,6 +615,16 @@ button.small {
     top: 64px;
 }
 
+#open-cards-button-alert {
+    width: 24px;
+    height: 24px;
+    position: absolute;
+    right: -8px;
+    top: -8px;
+    background: var(--cancel-color-background);
+    border-color: var(--cancel-color-outline);
+}
+
 .player-0 {
     border-color: var(--player0-color-outline); 
     background: var(--player0-background-gradient);
@@ -832,7 +842,7 @@ input, select {
     padding: 8px 16px;
     outline: none;
 }
-input:focus {
+form input:focus {
     outline: solid 3px var(--input-outline-color);
 }
 input::placeholder, select {

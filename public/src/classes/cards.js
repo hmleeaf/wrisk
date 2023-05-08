@@ -66,6 +66,22 @@ const Cards = (() => {
     let selectedCards = [];
     let errorTimeout;
 
+    const countCardSet = (cards) => {
+        const count = {
+            Infantry: 0,
+            Cavalry: 0,
+            Artillery: 0,
+        };
+        cards.forEach((cardType) => count[cardType]++);
+        let cardSet = undefined;
+        if (count.Infantry >= 1 && count.Cavalry >= 1 && count.Artillery >= 1)
+            cardSet = 'All';
+        else if (count.Infantry >= 3) cardSet = 'Infantry';
+        else if (count.Cavalry >= 3) cardSet = 'Cavalry';
+        else if (count.Artillery >= 3) cardSet = 'Artillery';
+        return cardSet;
+    };
+
     const initialize = () => {
         $('#trade-cards-button').on('click', () => {
             if (GameStateMachine.state !== 'SelfDraft') {
@@ -75,46 +91,16 @@ const Cards = (() => {
                 return;
             }
 
-            const count = {
-                Infantry: 0,
-                Cavalry: 0,
-                Artillery: 0,
-            };
-            selectedCards
-                .map((cardId) => cards[cardId])
-                .forEach((cardType) => count[cardType]++);
-
-            let cardSet = undefined;
-            if (
-                count.Infantry === 1 &&
-                count.Cavalry === 1 &&
-                count.Artillery === 1
-            )
-                cardSet = 'All';
-            else if (
-                count.Infantry === 3 &&
-                count.Cavalry === 0 &&
-                count.Artillery === 0
-            )
-                cardSet = 'Infantry';
-            else if (
-                count.Infantry === 0 &&
-                count.Cavalry === 3 &&
-                count.Artillery === 0
-            )
-                cardSet = 'Cavalry';
-            else if (
-                count.Infantry === 0 &&
-                count.Cavalry === 0 &&
-                count.Artillery === 3
-            )
-                cardSet = 'Artillery';
+            const cardSet = countCardSet(
+                selectedCards.map((cardId) => cards[cardId])
+            );
 
             if (!cardSet) {
                 showError('This is not a valid card set.');
                 return;
             }
 
+            selectedCards = [];
             hideError();
             Socket.requestCardTrade(cardSet);
         });
@@ -135,7 +121,7 @@ const Cards = (() => {
         if (cards_.length === cards.length + 1) {
             let newCards = cards_.map((card) => card);
             cards.forEach((oldCard) => {
-                const i = newCards.findIndex(oldCard);
+                const i = newCards.findIndex((c) => c === oldCard);
                 newCards = newCards.filter((_, idx) => idx !== i);
             });
             Notification.queueNotification('card', { card: newCards[0] });
@@ -183,6 +169,13 @@ const Cards = (() => {
         // update number on open button
         $('#cards-count-text').text(cards.length);
 
+        // display alert if have tradeable set
+        if (countCardSet(cards)) {
+            $('#open-cards-button-alert').show();
+        } else {
+            $('#open-cards-button-alert').hide();
+        }
+
         // default disable trade button
         $('#trade-cards-button').prop({ disabled: true });
     };
@@ -217,6 +210,7 @@ const Cards = (() => {
         selectedCards = [];
         if (errorTimeout) clearTimeout(errorTimeout);
         errorTimeout = undefined;
+        updateCards([]);
     };
 
     return {
