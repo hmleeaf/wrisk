@@ -690,6 +690,14 @@ io.on('connection', (socket) => {
       state: room.state,
       draftTroops: room.draftTroops
     })
+
+    io.to(room.roomCode).emit('map-update-notification', {
+      players: removeKeyFromArray(room.players, 'cards'),
+      roomCode: room.roomCode,
+      currentPlayerIndex: room.currentPlayerIndex,
+      board: room.board,
+      state: room.state,
+    })
   })
 
   // Format of req JSON:
