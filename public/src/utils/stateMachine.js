@@ -44,10 +44,12 @@ const STATES = {
                 UI.showHint(
                     'Tap any of your territories to begin deploying troops'
                 );
+                UI.highlightDraftableZones();
             },
             onExit: () => {
                 console.log('SelfDraft: onExit');
                 UI.hideHint();
+                UI.unhighlightBoardZones();
             },
         },
         data: {
@@ -144,10 +146,12 @@ const STATES = {
                 console.log('SelfAttack: onEnter');
                 UI.updateInfoPanel(true, PHASES.ATTACK);
                 UI.showHint('Select a territory to begin your attack from');
+                UI.highlightAttackableFromZones();
             },
             onExit: () => {
                 console.log('SelfAttack: onExit');
                 UI.hideHint();
+                UI.unhighlightBoardZones();
             },
         },
         data: {
@@ -317,10 +321,12 @@ const STATES = {
                 console.log('SelfFortify: onEnter');
                 UI.updateInfoPanel(true, PHASES.FORTIFY);
                 UI.showHint('Select a territory to move your troops from');
+                UI.highlightFortifyableFromZones();
             },
             onExit: () => {
                 console.log('SelfFortify: onExit');
                 UI.hideHint();
+                UI.unhighlightBoardZones();
             },
         },
         data: {

@@ -61,6 +61,26 @@ const Board = (() => {
         return { continents, territories };
     };
 
+    const getContinentsByOwner = (owner) => {
+        const continents = [];
+        board.continents.forEach((cont) => {
+            const isOwn = cont.territories.reduce(
+                (prev, curr) => prev && board.territories[curr].owner === owner,
+                true
+            );
+            if (isOwn) continents.push(cont.name);
+        });
+        return continents;
+    };
+
+    const getZonesByOwner = (owner) =>
+        board.territories.filter((t) => t.owner === owner).map((t) => t.id);
+
+    const getZonesByOwnerWithMinTroops = (owner, minTroops) =>
+        board.territories
+            .filter((t) => t.owner === owner && t.troops >= minTroops)
+            .map((t) => t.id);
+
     const initialize = (board_) => {
         board = board_;
     };
@@ -86,5 +106,8 @@ const Board = (() => {
         updateBoard,
         getOccupied,
         reset,
+        getContinentsByOwner,
+        getZonesByOwner,
+        getZonesByOwnerWithMinTroops,
     };
 })();

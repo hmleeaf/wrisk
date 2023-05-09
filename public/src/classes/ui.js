@@ -339,6 +339,29 @@ const UI = (() => {
                 fill: owner === 0 ? COLORS.player1.zone : COLORS.player2.zone,
             });
         });
+        highlightBoardZones(SVG.getPathsByIds(highlightedZoneIds));
+
+        const continentOwners = {
+            0: Board.getContinentsByOwner(0),
+            1: Board.getContinentsByOwner(1),
+        };
+        $('g#continents path').each((_, value) => {
+            const path = $(value);
+            const pathCont = path
+                .attr('class')
+                .substring(5)
+                .replaceAll('-', ' ');
+            if (continentOwners[0].includes(pathCont)) {
+                path.fadeIn();
+                path.css({ stroke: COLORS.player1.outline });
+            } else if (continentOwners[1].includes(pathCont)) {
+                path.fadeIn();
+                path.css({ stroke: COLORS.player2.outline });
+            } else {
+                path.fadeOut();
+                path.css({ stroke: '#000' });
+            }
+        });
     };
 
     const updateInfoPanel = (isSelfTurn, phase, troops) => {
@@ -391,9 +414,13 @@ const UI = (() => {
         $('#troops-text').text(Game.getDeployedTroops);
     };
 
+    let highlightedZoneIds = [];
+
     const highlightBoardZones = (zones) => {
+        console.log('highlight');
         if (Array.isArray(zones)) {
             zones.forEach((zone) => {
+                highlightedZoneIds.push(SVG.parseSvgToId(zone));
                 zone.css({
                     fill:
                         Board.getZoneOwner(SVG.parseSvgToId(zone)) === 0
@@ -403,6 +430,7 @@ const UI = (() => {
                 });
             });
         } else {
+            highlightedZoneIds.push(SVG.parseSvgToId(zones));
             zones.css({
                 fill:
                     Board.getZoneOwner(SVG.parseSvgToId(zones)) === 0
@@ -413,42 +441,25 @@ const UI = (() => {
         }
     };
 
-    const unhighlightBoardZones = (zones) => {
-        if (Array.isArray(zones)) {
-            zones.forEach((zone) => {
-                zone.css({
-                    fill:
-                        Board.getZoneOwner(SVG.parseSvgToId(zone)) === 0
-                            ? COLORS.player1.zone
-                            : COLORS.player2.zone,
-                    transition: '500ms',
-                });
-            });
-        } else if (zones) {
-            zones.css({
+    const unhighlightBoardZones = () => {
+        console.log('unhighlight');
+        highlightedZoneIds = [];
+        SVG.getPaths().forEach((path) => {
+            path.css({
                 fill:
-                    Board.getZoneOwner(SVG.parseSvgToId(zones)) === 0
+                    Board.getZoneOwner(SVG.parseSvgToId(path)) === 0
                         ? COLORS.player1.zone
                         : COLORS.player2.zone,
                 transition: '500ms',
             });
-        } else {
-            SVG.getPaths().forEach((path) => {
-                path.css({
-                    fill:
-                        Board.getZoneOwner(SVG.parseSvgToId(path)) === 0
-                            ? COLORS.player1.zone
-                            : COLORS.player2.zone,
-                    transition: '500ms',
-                });
-            });
-        }
+        });
     };
 
     const outlineBoardZone = (zone) => {
         zone.css({
             stroke: '#fff',
             transition: '500ms',
+            'stroke-width': 5,
         });
     };
 
@@ -457,8 +468,28 @@ const UI = (() => {
             path.css({
                 stroke: '#000',
                 transition: '500ms',
+                'stroke-width': 2,
             });
         });
+    };
+
+    const highlightDraftableZones = () => {
+        // all friendly zones
+        highlightBoardZones(
+            SVG.getPathsByIds(Board.getZonesByOwner(playerIdx))
+        );
+    };
+
+    const highlightAttackableFromZones = () => {
+        highlightBoardZones(
+            SVG.getPathsByIds(Board.getZonesByOwnerWithMinTroops(playerIdx, 2))
+        );
+    };
+
+    const highlightFortifyableFromZones = () => {
+        highlightBoardZones(
+            SVG.getPathsByIds(Board.getZonesByOwnerWithMinTroops(playerIdx, 2))
+        );
     };
 
     const getTroopByZone = (zone) =>
@@ -728,6 +759,9 @@ const UI = (() => {
         updateCurrentPlayerIdx,
         getPlayerIdx,
         reset,
+        highlightDraftableZones,
+        highlightAttackableFromZones,
+        highlightFortifyableFromZones,
     };
 })();
 

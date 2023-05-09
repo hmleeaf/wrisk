@@ -93,7 +93,7 @@ text {
 }
 
 g#areas path {
-    stroke-width: 5px;
+    stroke-width: 2px;
     stroke: #000;
 }
 
@@ -109,6 +109,11 @@ g#areas, g#text-backgrounds, g#texts {
 
 g#text-backgrounds ellipse {
     stroke-width: 3px;
+    stroke: #000;
+}
+
+g#continents path {
+    stroke-width: 7;
     stroke: #000;
 }
 
