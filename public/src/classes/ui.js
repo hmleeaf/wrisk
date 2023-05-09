@@ -352,13 +352,13 @@ const UI = (() => {
                 .substring(5)
                 .replaceAll('-', ' ');
             if (continentOwners[0].includes(pathCont)) {
-                path.fadeIn();
+                // path.fadeIn();
                 path.css({ stroke: COLORS.player1.outline });
             } else if (continentOwners[1].includes(pathCont)) {
-                path.fadeIn();
+                // path.fadeIn();
                 path.css({ stroke: COLORS.player2.outline });
             } else {
-                path.fadeOut();
+                // path.fadeOut();
                 path.css({ stroke: '#000' });
             }
         });
