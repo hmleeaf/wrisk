@@ -44,7 +44,7 @@ const STATES = {
                 UI.showHint(
                     'Tap any of your territories to begin deploying troops'
                 );
-                UI.highlightDraftableZones();
+                if (Game.getDraftTroops()) UI.highlightDraftableZones();
             },
             onExit: () => {
                 console.log('SelfDraft: onExit');

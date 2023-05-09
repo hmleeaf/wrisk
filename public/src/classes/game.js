@@ -23,6 +23,8 @@ const Game = (() => {
         originalNewTroops = draftTroops;
     };
 
+    const getDraftTroops = () => originalNewTroops;
+
     const beginDraft = (zone) => {
         UI.highlightBoardZones(zone);
         UI.outlineBoardZone(zone);
@@ -455,5 +457,6 @@ const Game = (() => {
         reset,
         requestBlitz,
         blitz,
+        getDraftTroops,
     };
 })();

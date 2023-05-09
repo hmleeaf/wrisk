@@ -415,34 +415,36 @@ const UI = (() => {
     };
 
     let highlightedZoneIds = [];
+    let highlightTimeouts = [];
 
     const highlightBoardZones = (zones) => {
         console.log('highlight');
         if (Array.isArray(zones)) {
             zones.forEach((zone) => {
                 highlightedZoneIds.push(SVG.parseSvgToId(zone));
-                zone.css({
-                    fill:
-                        Board.getZoneOwner(SVG.parseSvgToId(zone)) === 0
-                            ? COLORS.player1.highlight
-                            : COLORS.player2.highlight,
-                    transition: '500ms',
-                });
+                // zone.css({
+                //     fill:
+                //         Board.getZoneOwner(SVG.parseSvgToId(zone)) === 0
+                //             ? COLORS.player1.highlight
+                //             : COLORS.player2.highlight,
+                // });
             });
         } else {
             highlightedZoneIds.push(SVG.parseSvgToId(zones));
-            zones.css({
-                fill:
-                    Board.getZoneOwner(SVG.parseSvgToId(zones)) === 0
-                        ? COLORS.player1.highlight
-                        : COLORS.player2.highlight,
-                transition: '500ms',
-            });
+            // zones.css({
+            //     fill:
+            //         Board.getZoneOwner(SVG.parseSvgToId(zones)) === 0
+            //             ? COLORS.player1.highlight
+            //             : COLORS.player2.highlight,
+            // });
         }
+        animateHighlights();
     };
 
     const unhighlightBoardZones = () => {
         console.log('unhighlight');
+        highlightTimeouts.forEach((timeout) => clearTimeout(timeout));
+        highlightTimeouts = [];
         highlightedZoneIds = [];
         SVG.getPaths().forEach((path) => {
             path.css({
@@ -450,27 +452,41 @@ const UI = (() => {
                     Board.getZoneOwner(SVG.parseSvgToId(path)) === 0
                         ? COLORS.player1.zone
                         : COLORS.player2.zone,
-                transition: '500ms',
             });
         });
+    };
+
+    const animateHighlights = () => {
+        SVG.getPathsByIds(highlightedZoneIds).forEach((zone) => {
+            zone.css({
+                fill:
+                    Board.getZoneOwner(SVG.parseSvgToId(zone)) === 0
+                        ? COLORS.player1.highlight
+                        : COLORS.player2.highlight,
+            });
+        });
+        highlightTimeouts.push(
+            setTimeout(() => {
+                SVG.getPathsByIds(highlightedZoneIds).forEach((zone) => {
+                    zone.css({
+                        fill:
+                            Board.getZoneOwner(SVG.parseSvgToId(zone)) === 0
+                                ? COLORS.player1.zone
+                                : COLORS.player2.zone,
+                    });
+                });
+            }, 1000)
+        );
+        highlightTimeouts.push(setTimeout(animateHighlights, 2000));
     };
 
     const outlineBoardZone = (zone) => {
-        zone.css({
-            stroke: '#fff',
-            transition: '500ms',
-            'stroke-width': 5,
-        });
+        const id = SVG.parseSvgToId(zone);
+        $('g#outlines path#outline_' + id).fadeIn(200);
     };
 
     const unoutlineBoardZone = () => {
-        SVG.getPaths().forEach((path) => {
-            path.css({
-                stroke: '#000',
-                transition: '500ms',
-                'stroke-width': 2,
-            });
-        });
+        $('g#outlines path').fadeOut(200);
     };
 
     const highlightDraftableZones = () => {

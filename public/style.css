@@ -95,6 +95,7 @@ text {
 g#areas path {
     stroke-width: 2px;
     stroke: #000;
+    transition: 500ms all;
 }
 
 g#sea-routes path {
@@ -115,6 +116,13 @@ g#text-backgrounds ellipse {
 g#continents path {
     stroke-width: 7;
     stroke: #000;
+}
+
+g#outlines path {
+    fill: none;
+    stroke-width: 10;
+    stroke: #fff;
+    display: none;
 }
 
 button {
