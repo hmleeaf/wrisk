@@ -443,8 +443,7 @@ const UI = (() => {
 
     const unhighlightBoardZones = () => {
         console.log('unhighlight');
-        highlightTimeouts.forEach((timeout) => clearTimeout(timeout));
-        highlightTimeouts = [];
+        clearHighlightTimeouts();
         highlightedZoneIds = [];
         SVG.getPaths().forEach((path) => {
             path.css({
@@ -478,6 +477,11 @@ const UI = (() => {
             }, 1000)
         );
         highlightTimeouts.push(setTimeout(animateHighlights, 2000));
+    };
+
+    const clearHighlightTimeouts = () => {
+        highlightTimeouts.forEach((timeout) => clearTimeout(timeout));
+        highlightTimeouts = [];
     };
 
     const outlineBoardZone = (zone) => {
@@ -740,6 +744,7 @@ const UI = (() => {
         currentPlayerIdx = undefined;
         playerIdx = undefined;
         players = undefined;
+        clearHighlightTimeouts();
     };
 
     return {
